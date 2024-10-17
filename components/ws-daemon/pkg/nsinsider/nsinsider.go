@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package nsinsider
 
@@ -107,17 +107,9 @@ func Nsinsider(instanceID string, targetPid int, mod func(*exec.Cmd), opts ...ns
 	err = cmd.Run()
 	log.FromBuffer(&cmdOut, log.WithFields(log.OWI("", "", instanceID)))
 	if err != nil {
-		out, oErr := cmd.CombinedOutput()
-		if oErr != nil {
-			return fmt.Errorf("run nsinsider (%v) \n%v\n output error: %v",
-				cmd.Args,
-				err,
-				oErr,
-			)
-		}
 		return fmt.Errorf("run nsinsider (%v) failed: %q\n%v",
 			cmd.Args,
-			string(out),
+			cmdOut.String(),
 			err,
 		)
 	}

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package initializer
 
@@ -55,7 +55,7 @@ func (s *SnapshotInitializer) Run(ctx context.Context, mappings []archive.IDMapp
 
 	if fsErr == nil {
 		currentSize, fsErr := getFsUsage()
-		if fsErr == nil {
+		if fsErr != nil {
 			log.WithError(fsErr).Error("could not get disk usage")
 		}
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package bastion
 
@@ -208,7 +208,7 @@ type Bastion struct {
 }
 
 func (b *Bastion) Run() error {
-	updates, err := b.Client.InstanceUpdates(b.ctx, "")
+	updates, err := b.Client.WorkspaceUpdates(b.ctx, "")
 	if err != nil {
 		return err
 	}

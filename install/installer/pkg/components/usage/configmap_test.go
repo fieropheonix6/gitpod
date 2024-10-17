@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package usage
 
@@ -40,13 +41,18 @@ func TestConfigMap_ContainsSchedule(t *testing.T) {
 		  "usd": ""
 		}
 	   },
+	   "serverAddress": "server.test-namespace.svc.cluster.local:9877",
+	   "redis": {
+		 "address": "redis.test-namespace.svc.cluster.local:6379"
+	   },
        "server": {
          "services": {
            "grpc": {
              "address": "0.0.0.0:9001"
            }
          }
-       }
+       },
+	   "gitpodHost": "https://test.domain.everything.awesome.is"
      }`,
 		cfgmap.Data[configJSONFilename],
 	)

@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import * as chai from "chai";
-import { suite, test } from "mocha-typescript";
+import { suite, test } from "@testdeck/mocha";
 import {
     matchesInstanceIdOrLegacyWorkspaceIdExactly,
     matchesNewWorkspaceIdExactly,
@@ -79,6 +79,10 @@ export class ParseWorkspaceIdTest {
     }
     @test public matchesWorkspaceIdExactly_new_negative() {
         const actual = matchesNewWorkspaceIdExactly("moccasin-ferret-15599b3");
+        expect(actual).to.be.false;
+    }
+    @test public matchesWorkspaceIdExactly_new_negative_empty() {
+        const actual = matchesNewWorkspaceIdExactly(undefined);
         expect(actual).to.be.false;
     }
 }

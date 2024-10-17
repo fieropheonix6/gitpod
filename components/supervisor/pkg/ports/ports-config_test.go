@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package ports
 
@@ -83,8 +83,10 @@ func TestPortsConfig(t *testing.T) {
 		t.Run(test.Desc, func(t *testing.T) {
 			configService := &testGitpodConfigService{
 				configs: make(chan *gitpod.GitpodConfig),
+				changes: make(chan *struct{}),
 			}
 			defer close(configService.configs)
+			defer close(configService.changes)
 
 			context, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -94,9 +96,7 @@ func TestPortsConfig(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			gitpodAPI := gitpod.NewMockAPIInterface(ctrl)
-
-			service := NewConfigService(workspaceID, configService, gitpodAPI)
+			service := NewConfigService(workspaceID, configService)
 			updates, errors := service.Observe(context)
 
 			actual := &PortConfigTestExpectations{}
@@ -130,6 +130,7 @@ type PortConfigTestExpectations struct {
 
 type testGitpodConfigService struct {
 	configs chan *gitpod.GitpodConfig
+	changes chan *struct{}
 }
 
 func (service *testGitpodConfigService) Watch(ctx context.Context) {
@@ -137,4 +138,8 @@ func (service *testGitpodConfigService) Watch(ctx context.Context) {
 
 func (service *testGitpodConfigService) Observe(ctx context.Context) <-chan *gitpod.GitpodConfig {
 	return service.configs
+}
+
+func (service *testGitpodConfigService) ObserveImageFile(ctx context.Context) <-chan *struct{} {
+	return service.changes
 }

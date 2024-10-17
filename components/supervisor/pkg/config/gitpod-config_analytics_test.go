@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package config
 
@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	"github.com/gitpod-io/gitpod/common-go/log"
 	gitpod "github.com/gitpod-io/gitpod/gitpod-protocol"
 )
 
@@ -65,7 +66,7 @@ func TestAnalyzeGitpodConfig(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.Desc, func(t *testing.T) {
 			var fields []string
-			analyzer := NewConfigAnalyzer(log, 100*time.Millisecond, func(field string) {
+			analyzer := NewConfigAnalyzer(log.Log, 100*time.Millisecond, func(field string) {
 				fields = append(fields, field)
 			}, test.Prev)
 			<-analyzer.Analyse(test.Current)

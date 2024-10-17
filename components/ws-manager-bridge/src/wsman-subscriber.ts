@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import {
@@ -47,11 +47,12 @@ export class WsmanSubscriber implements Disposable {
                     // start subscription
                     const req = new SubscribeRequest();
                     this.sub = await client.subscribe({}, req);
+                    log.info("wsman subscription established", payload);
 
                     this.sub.on("data", (incoming: SubscribeResponse) => {
                         const status = incoming.getStatus();
                         if (!!status) {
-                            let header: any = {};
+                            const header: any = {};
                             if (!!incoming.getHeaderMap()) {
                                 incoming.getHeaderMap().forEach((v: string, k: string) => (header[k] = v));
                             }
@@ -77,6 +78,7 @@ export class WsmanSubscriber implements Disposable {
                         }
                     });
                     this.sub.on("end", function () {
+                        log.info("wsman subscription ended", payload);
                         resolve();
                     });
                     this.sub.on("error", function (e) {

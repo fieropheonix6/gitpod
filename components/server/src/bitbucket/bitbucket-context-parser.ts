@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import {
@@ -45,6 +45,7 @@ export class BitbucketContextParser extends AbstractContextParser implements ICo
                         const isHash = await this.isValidCommitHash(user, owner, repoName, branchTagOrHash);
                         if (isHash) {
                             more.revision = branchTagOrHash;
+                            more.refType = "revision";
                             if (searchParams.has("at")) {
                                 more.ref = searchParams.get("at")!;
                                 more.refType = "branch";
@@ -327,6 +328,7 @@ export class BitbucketContextParser extends AbstractContextParser implements ICo
             owner,
             private: !!repo.isPrivate,
             defaultBranch: repo.mainbranch ? repo.mainbranch.name : DEFAULT_BRANCH,
+            displayName: repo.name,
         };
         if (!!repo.parent && !!repo.parent.full_name) {
             const api = await this.api(user);

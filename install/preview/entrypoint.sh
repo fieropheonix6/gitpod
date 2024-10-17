@@ -1,6 +1,7 @@
 #!/bin/sh
 # Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-# Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+# Licensed under the GNU Affero General Public License (AGPL).
+# See License.AGPL.txt in the project root for license information.
 
 set -e
 
@@ -209,7 +210,6 @@ rm /var/lib/rancher/k3s/server/manifests/gitpod/*Issuer*
 # update PersistentVolumeClaim's to use k3s's `local-path` storage class
 for f in /var/lib/rancher/k3s/server/manifests/gitpod/*PersistentVolumeClaim*.yaml; do yq e -i '.spec.storageClassName="local-path"' "$f"; done
 # Set `volumeClassTemplate` so that each replica creates its own PVC
-yq eval-all -i ". as \$item ireduce ({}; . *+ \$item)" /var/lib/rancher/k3s/server/manifests/gitpod/*_StatefulSet_messagebus.yaml /app/manifests/messagebus.yaml
 # update Statefulset's to use k3s's `local-path` storage class
 for f in /var/lib/rancher/k3s/server/manifests/gitpod/*StatefulSet*.yaml; do yq e -i '.spec.volumeClaimTemplates[0].spec.storageClassName="local-path"' "$f"; done
 
@@ -260,5 +260,6 @@ run_telemetry 2>&1 &
   --node-label gitpod.io/workload_meta=true \
   --node-label gitpod.io/workload_ide=true \
   --node-label gitpod.io/workload_workspace_services=true \
+  --node-label gitpod.io/workload_services=true \
   --node-label gitpod.io/workload_workspace_regular=true \
   --node-label gitpod.io/workload_workspace_headless=true

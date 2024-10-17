@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { inject, injectable } from "inversify";
@@ -9,7 +9,7 @@ import { EntityManager, Repository } from "typeorm";
 import { TypeORM } from "./typeorm";
 import { DBBlockedRepository } from "./entity/db-blocked-repository";
 import { BlockedRepositoryDB } from "../blocked-repository-db";
-import { BlockedRepository } from "@gitpod/gitpod-protocol/src/blocked-repositories-protocol";
+import { BlockedRepository } from "@gitpod/gitpod-protocol/lib/blocked-repositories-protocol";
 
 @injectable()
 export class TypeORMBlockedRepositoryDBImpl implements BlockedRepositoryDB {
@@ -23,10 +23,19 @@ export class TypeORMBlockedRepositoryDBImpl implements BlockedRepositoryDB {
         return (await this.getEntityManager()).getRepository<DBBlockedRepository>(DBBlockedRepository);
     }
 
-    public async createBlockedRepository(urlRegexp: string, blockUser: boolean): Promise<BlockedRepository> {
+    public async createBlockedRepository(
+        urlRegexp: string,
+        blockUser: boolean,
+        blockFreeUsage: boolean,
+    ): Promise<BlockedRepository> {
         const blockedRepositoryRepo = await this.getBlockedRepositoryRepo();
 
-        return await blockedRepositoryRepo.save({ urlRegexp: urlRegexp, blockUser: blockUser, deleted: false });
+        return await blockedRepositoryRepo.save({
+            urlRegexp: urlRegexp,
+            blockUser: blockUser,
+            blockFreeUsage: blockFreeUsage,
+            deleted: false,
+        });
     }
 
     public async deleteBlockedRepository(id: number): Promise<void> {

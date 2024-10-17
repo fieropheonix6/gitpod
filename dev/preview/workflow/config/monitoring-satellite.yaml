@@ -7,6 +7,7 @@ tracing:
     preview.name: ${PREVIEW_NAME}
 certmanager:
   installServiceMonitors: true
+  namespace: cert-manager
 pyrra:
   install: true
 prometheus:
@@ -33,8 +34,6 @@ imports:
     - gitURL: https://github.com/gitpod-io/observability
       path: monitoring-satellite/manifests/kube-prometheus-rules
     - gitURL: https://github.com/gitpod-io/observability
-      path: monitoring-satellite/manifests/kubescape
-    - gitURL: https://github.com/gitpod-io/observability
       path: monitoring-satellite/manifests/grafana
     - gitURL: https://github.com/gitpod-io/observability
       path: monitoring-satellite/manifests/probers
@@ -44,4 +43,3 @@ imports:
     - path: ${WORKSPACE_ROOT}/operations/observability/mixins/workspace/rules/satellite
     - path: ${WORKSPACE_ROOT}/operations/observability/mixins/meta/rules
     - path: ${WORKSPACE_ROOT}/operations/observability/mixins/IDE/rules
-    - path: ${WORKSPACE_ROOT}/operations/observability/mixins/self-hosted/rules/cardinality-analysis

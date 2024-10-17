@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package metrics
 
@@ -41,6 +41,10 @@ func NewGrpcMetricsReporter(gitpodHost string) *GrpcMetricsReporter {
 			"grpc_server_handling_seconds":        true,
 			"supervisor_ide_ready_duration_total": true,
 			"supervisor_initializer_bytes_second": true,
+			"supervisor_client_handled_total":     true,
+			"supervisor_client_handling_seconds":  true,
+			"supervisor_ssh_tunnel_opened_total":  true,
+			"supervisor_ssh_tunnel_closed_total":  true,
 		},
 		values: make(map[string]float64),
 		addCounter: func(name string, labels map[string]string, value uint64) {
@@ -171,7 +175,16 @@ func doAddCounter(gitpodHost string, name string, labels map[string]string, valu
 		return
 	}
 	url := fmt.Sprintf("https://ide.%s/metrics-api/metrics/counter/add/%s", gitpodHost, name)
-	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		log.WithError(err).Error("supervisor: grpc metric: failed to create request")
+		return
+	}
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client", "supervisor")
+	resp, err := http.DefaultClient.Do(request)
 	var statusCode int
 	if resp != nil {
 		statusCode = resp.StatusCode
@@ -214,7 +227,16 @@ func doAddHistogram(gitpodHost string, name string, labels map[string]string, co
 		return
 	}
 	url := fmt.Sprintf("https://ide.%s/metrics-api/metrics/histogram/add/%s", gitpodHost, name)
-	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		log.WithError(err).Error("supervisor: grpc metric: failed to create request")
+		return
+	}
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-Client", "supervisor")
+	resp, err := http.DefaultClient.Do(request)
 	var statusCode int
 	if resp != nil {
 		statusCode = resp.StatusCode

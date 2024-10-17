@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package db
 
@@ -28,9 +28,6 @@ type Project struct {
 	UserID sql.NullString `gorm:"column:userId;type:char;size:36;" json:"userId"`
 
 	MarkedDeleted bool `gorm:"column:markedDeleted;type:tinyint;default:0;" json:"markedDeleted"`
-
-	// deleted is reserved for use by db-sync
-	_ bool `gorm:"column:deleted;type:tinyint;default:0;" json:"deleted"`
 }
 
 // TableName sets the insert table name for this struct type

@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package auth
 
@@ -20,7 +20,6 @@ func TestGeneratePersonalAccessToken(t *testing.T) {
 
 	pat, err := GeneratePersonalAccessToken(signer)
 	require.NoError(t, err)
-	fmt.Println(pat)
 
 	signature, err := signer.Sign([]byte(pat.value))
 	require.NoError(t, err)

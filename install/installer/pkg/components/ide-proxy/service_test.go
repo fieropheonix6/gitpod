@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package ide_proxy
 
@@ -11,14 +12,13 @@ import (
 
 	"github.com/gitpod-io/gitpod/installer/pkg/common"
 	config "github.com/gitpod-io/gitpod/installer/pkg/config/v1"
-	"github.com/gitpod-io/gitpod/installer/pkg/config/v1/experimental"
 	"github.com/gitpod-io/gitpod/installer/pkg/config/versions"
 )
 
 func TestServiceAnnotations(t *testing.T) {
 	annotations := map[string]string{"hello": "world"}
 
-	ctx := renderContextWithIDEProxyConfig(t, &experimental.IDEProxyConfig{ServiceAnnotations: annotations})
+	ctx := renderContextWithIDEProxyConfig(t, &config.Proxy{ServiceAnnotations: annotations})
 
 	objects, err := service(ctx)
 	require.NoError(t, err)
@@ -32,11 +32,11 @@ func TestServiceAnnotations(t *testing.T) {
 	}
 }
 
-func renderContextWithIDEProxyConfig(t *testing.T, proxyConfig *experimental.IDEProxyConfig) *common.RenderContext {
+func renderContextWithIDEProxyConfig(t *testing.T, proxyConfig *config.Proxy) *common.RenderContext {
 	ctx, err := common.NewRenderContext(config.Config{
-		Experimental: &experimental.Config{
-			IDE: &experimental.IDEConfig{
-				IDEProxyConfig: proxyConfig,
+		Components: &config.Components{
+			IDE: &config.IDEComponents{
+				Proxy: proxyConfig,
 			},
 		},
 	}, versions.Manifest{

@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package experimental
 
@@ -45,6 +45,10 @@ func ClusterValidation(cfg *Config) cluster.ValidationChecks {
 	if cfg.Workspace != nil {
 		if scr := cfg.Workspace.RegistryFacade.RedisCache.PasswordSecret; scr != "" {
 			res = append(res, cluster.CheckSecret(scr, cluster.CheckSecretRequiredData("password")))
+		}
+
+		if cfg.Workspace.WorkspaceCIDR != "" {
+			res = append(res, cluster.CheckWorkspaceCIDR(cfg.Workspace.WorkspaceCIDR))
 		}
 	}
 

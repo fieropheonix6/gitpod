@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { inject, injectable } from "inversify";
@@ -32,7 +32,7 @@ export class CodeSyncResourceDB {
         const resourcesResult = await connection.manager
             .createQueryBuilder(DBCodeSyncResource, "resource")
             .where(
-                "resource.userId = :userId AND resource.kind != 'editSessions' AND resource.collection = :collection AND resource.deleted = 0",
+                "resource.userId = :userId AND resource.kind != 'editSessions' AND resource.collection = :collection",
                 {
                     userId,
                     collection: uuid.NIL,
@@ -46,7 +46,7 @@ export class CodeSyncResourceDB {
                     .addSelect("max(resource2.created)")
                     .from(DBCodeSyncResource, "resource2")
                     .where(
-                        "resource2.userId = :userId AND resource2.kind != 'editSessions' AND resource2.collection = :collection AND resource2.deleted = 0",
+                        "resource2.userId = :userId AND resource2.kind != 'editSessions' AND resource2.collection = :collection",
                         { userId, collection: uuid.NIL },
                     )
                     .groupBy("resource2.kind")
@@ -63,7 +63,7 @@ export class CodeSyncResourceDB {
         const collectionsResult = await connection.manager
             .createQueryBuilder(DBCodeSyncResource, "resource")
             .where(
-                "resource.userId = :userId AND resource.kind != 'editSessions' AND resource.collection != :collection AND resource.deleted = 0",
+                "resource.userId = :userId AND resource.kind != 'editSessions' AND resource.collection != :collection",
                 {
                     userId,
                     collection: uuid.NIL,
@@ -78,7 +78,7 @@ export class CodeSyncResourceDB {
                     .addSelect("max(resource2.created)")
                     .from(DBCodeSyncResource, "resource2")
                     .where(
-                        "resource2.userId = :userId AND resource2.kind != 'editSessions' AND resource2.collection != :collection AND resource2.deleted = 0",
+                        "resource2.userId = :userId AND resource2.kind != 'editSessions' AND resource2.collection != :collection",
                         { userId, collection: uuid.NIL },
                     )
                     .groupBy("resource2.kind")
@@ -132,8 +132,8 @@ export class CodeSyncResourceDB {
         await connection.transaction(async (manager) => {
             await manager
                 .createQueryBuilder()
-                .update(DBCodeSyncResource)
-                .set({ deleted: true })
+                .delete()
+                .from(DBCodeSyncResource)
                 .where("userId = :userId AND kind != 'editSessions' AND collection = :collection", {
                     userId,
                     collection: uuid.NIL,
@@ -155,8 +155,8 @@ export class CodeSyncResourceDB {
             await connection.transaction(async (manager) => {
                 await manager
                     .createQueryBuilder()
-                    .update(DBCodeSyncResource)
-                    .set({ deleted: true })
+                    .delete()
+                    .from(DBCodeSyncResource)
                     .where("userId = :userId AND kind = :kind AND rev = :rev AND collection = :collection", {
                         userId,
                         kind,
@@ -170,8 +170,8 @@ export class CodeSyncResourceDB {
             await connection.transaction(async (manager) => {
                 await manager
                     .createQueryBuilder()
-                    .update(DBCodeSyncResource)
-                    .set({ deleted: true })
+                    .delete()
+                    .from(DBCodeSyncResource)
                     .where("userId = :userId AND kind = :kind AND collection = :collection", {
                         userId,
                         kind,
@@ -236,19 +236,21 @@ export class CodeSyncResourceDB {
         if (rev === "latest") {
             return manager
                 .createQueryBuilder(DBCodeSyncResource, "resource")
-                .where(
-                    "resource.userId = :userId AND resource.kind = :kind AND resource.collection = :collection AND resource.deleted = 0",
-                    { userId, kind, collection: collection || uuid.NIL },
-                )
+                .where("resource.userId = :userId AND resource.kind = :kind AND resource.collection = :collection", {
+                    userId,
+                    kind,
+                    collection: collection || uuid.NIL,
+                })
                 .orderBy("resource.created", "DESC")
                 .getOne();
         } else {
             return manager
                 .createQueryBuilder(DBCodeSyncResource, "resource")
-                .where(
-                    "resource.userId = :userId AND resource.kind = :kind AND resource.collection = :collection AND resource.deleted = 0",
-                    { userId, kind, collection: collection || uuid.NIL },
-                )
+                .where("resource.userId = :userId AND resource.kind = :kind AND resource.collection = :collection", {
+                    userId,
+                    kind,
+                    collection: collection || uuid.NIL,
+                })
                 .andWhere("resource.rev = :rev", { rev })
                 .getOne();
         }
@@ -263,28 +265,29 @@ export class CodeSyncResourceDB {
         return manager
             .getRepository(DBCodeSyncResource)
             .createQueryBuilder("resource")
-            .where(
-                "resource.userId = :userId AND resource.kind = :kind AND resource.collection = :collection AND resource.deleted = 0",
-                { userId, kind, collection: collection || uuid.NIL },
-            )
+            .where("resource.userId = :userId AND resource.kind = :kind AND resource.collection = :collection", {
+                userId,
+                kind,
+                collection: collection || uuid.NIL,
+            })
             .orderBy("resource.created", "DESC")
             .getMany();
     }
 
-    async getCollections(userId: string): Promise<string[]> {
+    async getCollections(userId: string): Promise<{ id: string }[]> {
         const connection = await this.typeORM.getConnection();
         const result = await connection.manager
             .createQueryBuilder(DBCodeSyncCollection, "collection")
-            .where("collection.userId = :userId AND collection.deleted = 0", { userId })
+            .where("collection.userId = :userId", { userId })
             .getMany();
-        return result.map((r) => r.collection);
+        return result.map((r) => ({ id: r.collection }));
     }
 
     async isCollection(userId: string, collection: string): Promise<boolean> {
         const connection = await this.typeORM.getConnection();
         const result = await connection.manager
             .createQueryBuilder(DBCodeSyncCollection, "collection")
-            .where("collection.userId = :userId AND collection.collection = :collection AND collection.deleted = 0", {
+            .where("collection.userId = :userId AND collection.collection = :collection", {
                 userId,
                 collection,
             })
@@ -317,14 +320,14 @@ export class CodeSyncResourceDB {
             await connection.transaction(async (manager) => {
                 await manager
                     .createQueryBuilder()
-                    .update(DBCodeSyncCollection)
-                    .set({ deleted: true })
+                    .delete()
+                    .from(DBCodeSyncCollection)
                     .where("userId = :userId AND collection = :collection", { userId, collection })
                     .execute();
                 await manager
                     .createQueryBuilder()
-                    .update(DBCodeSyncResource)
-                    .set({ deleted: true })
+                    .delete()
+                    .from(DBCodeSyncResource)
                     .where("userId = :userId AND collection = :collection", { userId, collection })
                     .execute();
                 await doDelete(collection);
@@ -334,14 +337,14 @@ export class CodeSyncResourceDB {
             await connection.transaction(async (manager) => {
                 await manager
                     .createQueryBuilder()
-                    .update(DBCodeSyncCollection)
-                    .set({ deleted: true })
+                    .delete()
+                    .from(DBCodeSyncCollection)
                     .where("userId = :userId", { userId })
                     .execute();
                 await manager
                     .createQueryBuilder()
-                    .update(DBCodeSyncResource)
-                    .set({ deleted: true })
+                    .delete()
+                    .from(DBCodeSyncResource)
                     .where("userId = :userId AND collection != :collection", { userId, collection: uuid.NIL })
                     .execute();
                 await doDelete();

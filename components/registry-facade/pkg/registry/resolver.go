@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package registry
 
@@ -9,8 +9,8 @@ import (
 	"encoding/json"
 
 	"github.com/containerd/containerd/remotes"
-	redis "github.com/go-redis/redis/v8"
 	ociv1 "github.com/opencontainers/image-spec/specs-go/v1"
+	redis "github.com/redis/go-redis/v9"
 )
 
 type RedisCachedResolver struct {

@@ -1,11 +1,13 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package server
 
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -13,6 +15,8 @@ import (
 	"k8s.io/utils/pointer"
 
 	"github.com/gitpod-io/gitpod/installer/pkg/common"
+	"github.com/gitpod-io/gitpod/installer/pkg/components/auth"
+	"github.com/gitpod-io/gitpod/installer/pkg/components/redis"
 	config "github.com/gitpod-io/gitpod/installer/pkg/config/v1"
 	"github.com/gitpod-io/gitpod/installer/pkg/config/v1/experimental"
 	"github.com/gitpod-io/gitpod/installer/pkg/config/versions"
@@ -29,6 +33,8 @@ func TestConfigMap(t *testing.T) {
 		JWTSecret                         string
 		SessionSecret                     string
 		GitHubApp                         experimental.GithubApp
+		Auth                              auth.Config
+		Redis                             redis.Configuration
 	}
 
 	expectation := Expectation{
@@ -51,9 +57,33 @@ func TestConfigMap(t *testing.T) {
 			WebhookSecret:   "some-webhook-secret",
 			CertSecretName:  "some-cert-secret-name",
 		},
+		Auth: auth.Config{
+			PKI: auth.PKIConfig{
+				Signing: auth.KeyPair{
+					ID:             "0001",
+					PrivateKeyPath: "/secrets/auth-pki/signing/tls.key",
+					PublicKeyPath:  "/secrets/auth-pki/signing/tls.crt",
+				},
+			},
+			Session: auth.SessionConfig{
+				LifetimeSeconds: int64((7 * 24 * time.Hour).Seconds()),
+				Issuer:          "https://awesome.domain",
+				Cookie: auth.CookieConfig{
+					Name:     "__Host-_awesome_domain_jwt2_",
+					MaxAge:   int64((7 * 24 * time.Hour).Seconds()),
+					SameSite: "lax",
+					Secure:   true,
+					HTTPOnly: true,
+				},
+			},
+		},
+		Redis: redis.Configuration{
+			Address: "redis.test_namespace.svc.cluster.local:6379",
+		},
 	}
 
 	ctx, err := common.NewRenderContext(config.Config{
+		Domain: "awesome.domain",
 		Workspace: config.Workspace{
 			WorkspaceImage: expectation.WorkspaceImage,
 		},
@@ -121,6 +151,8 @@ func TestConfigMap(t *testing.T) {
 			WebhookSecret:   config.GitHubApp.WebhookSecret,
 			CertSecretName:  config.GitHubApp.CertSecretName,
 		},
+		Auth:  config.Auth,
+		Redis: config.Redis,
 	}
 
 	assert.Equal(t, expectation, actual)

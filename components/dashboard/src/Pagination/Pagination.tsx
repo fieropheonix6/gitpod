@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { getPaginationNumbers } from "./getPagination";
@@ -48,7 +48,11 @@ function Pagination(props: PaginationProps) {
                 />
                 {calculatedPagination.map((pn, i) => {
                     if (pn === "...") {
-                        return <li className={getClassnames(pn)}>&#8230;</li>;
+                        return (
+                            <li key={i} className={getClassnames(pn)}>
+                                &#8230;
+                            </li>
+                        );
                     }
                     return (
                         <li key={i} className={getClassnames(pn)} onClick={() => typeof pn === "number" && setPage(pn)}>

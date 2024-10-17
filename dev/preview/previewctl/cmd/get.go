@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
@@ -28,6 +28,7 @@ func newGetCmd(logger *logrus.Logger) *cobra.Command {
 	cmd.AddCommand(
 		newGetNameSubCmd(),
 		newGetActiveCmd(logger),
+		newGetUrlSubCmd(),
 	)
 
 	return cmd
@@ -44,6 +45,26 @@ func newGetNameSubCmd() *cobra.Command {
 			}
 
 			fmt.Println(previewName)
+
+			return nil
+		},
+	}
+
+	return cmd
+}
+
+func newGetUrlSubCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "url",
+		Short: "",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			previewName, err := preview.GetName(branch)
+			if err != nil {
+				return err
+			}
+
+			previewUrl := fmt.Sprintf("https://%s.preview.gitpod-dev.com", previewName)
+			fmt.Println(previewUrl)
 
 			return nil
 		},

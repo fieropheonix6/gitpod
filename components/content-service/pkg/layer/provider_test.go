@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package layer
 
@@ -20,7 +20,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/opencontainers/go-digest"
-	ociv1 "github.com/opencontainers/image-spec/specs-go/v1"
 
 	csapi "github.com/gitpod-io/gitpod/content-service/api"
 	"github.com/gitpod-io/gitpod/content-service/pkg/storage"
@@ -64,26 +63,6 @@ func TestGetContentLayer(t *testing.T) {
 			Name: "legacy backup",
 			Backup: &storage.DownloadInfo{
 				URL: "https://somewhere-else.com/backup.tar",
-			},
-		},
-		{
-			Name:                "full workspace backup",
-			ContentManifestType: csapi.ContentTypeManifest,
-			ContentManifest: &csapi.WorkspaceContentManifest{
-				Type: csapi.TypeFullWorkspaceContentV1,
-				Layers: []csapi.WorkspaceContentLayer{
-					{
-						Descriptor: ociv1.Descriptor{
-							MediaType: csapi.MediaTypeUncompressedLayer,
-							Digest:    digest.NewDigestFromHex("sha256", "606c898987d799dd1fed7e39fa59c2adfd6fb1a4635a060ba6fab00f86bc050d"),
-							Size:      5479274496,
-						},
-						Bucket:     "bucket-workspace-owner",
-						DiffID:     digest.NewDigestFromHex("sha256", "606c898987d799dd1fed7e39fa59c2adfd6fb1a4635a060ba6fab00f86bc050d"),
-						InstanceID: "some-previous-instance",
-						Object:     "workspaces/workspace-id/wsfull-someprevious.tar",
-					},
-				},
 			},
 		},
 	}
@@ -214,7 +193,7 @@ func (*testStorage) Bucket(userID string) string {
 	return "bucket-" + userID
 }
 
-func (*testStorage) BlobObject(name string) (string, error) {
+func (*testStorage) BlobObject(userID, name string) (string, error) {
 	return "blobs/" + name, nil
 }
 
@@ -242,7 +221,7 @@ func (s *testStorage) DeleteObject(ctx context.Context, bucket string, query *st
 	return nil
 }
 
-func (s *testStorage) DeleteBucket(ctx context.Context, bucket string) error {
+func (s *testStorage) DeleteBucket(ctx context.Context, userID, bucket string) error {
 	return nil
 }
 

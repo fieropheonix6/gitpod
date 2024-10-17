@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package proxy
 
@@ -69,6 +69,16 @@ func service(ctx *common.RenderContext) ([]runtime.Object, error) {
 			Name:          baseserver.BuiltinMetricsPortName,
 			ContainerPort: baseserver.BuiltinMetricsPort,
 			ServicePort:   baseserver.BuiltinMetricsPort,
+		},
+		{
+			Name:          ContainerAnalyticsName,
+			ContainerPort: ContainerAnalyticsPort,
+			ServicePort:   ContainerAnalyticsPort,
+		},
+		{
+			Name:          ContainerConfigcatName,
+			ContainerPort: ContainerConfigcatPort,
+			ServicePort:   ContainerConfigcatPort,
 		},
 	}
 	if ctx.Config.SSHGatewayHostKey != nil {

@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package usage
 
@@ -39,13 +40,6 @@ func networkpolicy(ctx *common.RenderContext) ([]runtime.Object, error) {
 								PodSelector: &metav1.LabelSelector{
 									MatchLabels: map[string]string{
 										"component": common.ServerComponent,
-									},
-								},
-							},
-							{
-								PodSelector: &metav1.LabelSelector{
-									MatchLabels: map[string]string{
-										"component": common.SlowServerComponent,
 									},
 								},
 							},

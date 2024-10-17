@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package io.gitpod.jetbrains.auth
 
@@ -16,7 +16,7 @@ import org.jetbrains.io.response
 import java.nio.charset.StandardCharsets
 
 internal class GitpodAuthCallbackHandler : RestService() {
-    private val service = GitpodAuthService.instance
+    private val service = GitpodAuthService.instance.get()
 
     override fun getServiceName(): String = service.name
 
@@ -25,7 +25,7 @@ internal class GitpodAuthCallbackHandler : RestService() {
         request: FullHttpRequest,
         context: ChannelHandlerContext
     ): String? {
-        service.handleServerCallback(urlDecoder.path(), urlDecoder.parameters())
+        service.handleOAuthServerCallback(urlDecoder.path(), urlDecoder.parameters())
         sendResponse(
             request,
             context,

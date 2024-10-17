@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package openvsx_proxy
 
@@ -27,7 +27,6 @@ func configmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 		CacheDurationRegular: util.Duration(time.Minute * 5),
 		CacheDurationBackup:  util.Duration(time.Hour * 72),
 		URLUpstream:          ctx.Config.OpenVSX.URL,
-		URLLocal:             fmt.Sprintf("https://open-vsx.%s", ctx.Config.Domain),
 		MaxIdleConns:         1000,
 		MaxIdleConnsPerHost:  1000,
 		PrometheusAddr:       common.LocalhostPrometheusAddr(),

@@ -1,7 +1,7 @@
 <!--
  Copyright (c) 2021 Gitpod GmbH. All rights reserved.
  Licensed under the GNU Affero General Public License (AGPL).
- See License-AGPL.txt in the project root for license information.
+ See License.AGPL.txt in the project root for license information.
 -->
 
 <idea-plugin require-restart="false" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -18,6 +18,8 @@
     see https://jetbrains.slack.com/archives/C02BRJLGPGF/p1643369943314119?thread_ts=1643358812.185799&cid=C02BRJLGPGF
     <depends>com.jetbrains.gateway</depends> -->
 
+    <depends optional="true">com.jetbrains.gateway</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <httpRequestHandler implementation="io.gitpod.jetbrains.auth.GitpodAuthCallbackHandler"/>
         <applicationService serviceImplementation="io.gitpod.jetbrains.gateway.GitpodSettingsState"/>
@@ -27,6 +29,7 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains">
+        <gatewayConnector implementation="io.gitpod.jetbrains.gateway.GitpodConnector"/>
         <gatewayConnectionProvider implementation="io.gitpod.jetbrains.gateway.GitpodConnectionProvider"/>
     </extensions>
 

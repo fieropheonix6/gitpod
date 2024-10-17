@@ -1,11 +1,13 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -18,6 +20,7 @@ import (
 
 	"github.com/gitpod-io/gitpod/common-go/log"
 	"github.com/gitpod-io/gitpod/common-go/process"
+	"github.com/gitpod-io/gitpod/supervisor/pkg/shared"
 	"github.com/gitpod-io/gitpod/supervisor/pkg/supervisor"
 	"github.com/prometheus/procfs"
 	reaper "github.com/ramr/go-reaper"
@@ -28,7 +31,9 @@ var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "init the supervisor",
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Init(ServiceName, Version, true, false)
+		logFile := initLog(true)
+		defer logFile.Close()
+
 		cfg, err := supervisor.GetConfig()
 		if err != nil {
 			log.WithError(err).Info("cannnot load config")
@@ -38,10 +43,27 @@ var initCmd = &cobra.Command{
 		)
 		signal.Notify(sigInput, os.Interrupt, syscall.SIGTERM)
 
+		// check if git executable exists, supervisor will fail if it doesn't
+		// checking for it here allows to bubble up this error to the user
+		_, err = exec.LookPath("git")
+		if err != nil {
+			log.WithError(err).Fatal("cannot find git executable, make sure it is installed as part of gitpod image")
+		}
+
 		supervisorPath, err := os.Executable()
 		if err != nil {
 			supervisorPath = "/.supervisor/supervisor"
 		}
+
+		debugProxyCtx, stopDebugProxy := context.WithCancel(context.Background())
+		if os.Getenv("SUPERVISOR_DEBUG_WORKSPACE_TYPE") != "" {
+			err = exec.CommandContext(debugProxyCtx, supervisorPath, "debug-proxy").Start()
+			if err != nil {
+				log.WithError(err).Fatal("cannot run debug workspace proxy")
+			}
+		}
+		defer stopDebugProxy()
+
 		runCommand := exec.Command(supervisorPath, "run")
 		runCommand.Args[0] = "supervisor"
 		runCommand.Stdin = os.Stdin
@@ -61,7 +83,12 @@ var initCmd = &cobra.Command{
 			err := runCommand.Wait()
 			if err != nil && !(strings.Contains(err.Error(), "signal: ") || strings.Contains(err.Error(), "no child processes")) {
 				if eerr, ok := err.(*exec.ExitError); ok && eerr.ExitCode() != 0 {
-					log.WithError(err).Fatal("supervisor run error with unexpected exit code")
+					logs := extractFailureFromRun()
+					if shared.IsExpectedShutdown(eerr.ExitCode()) {
+						log.Fatal(logs)
+					} else {
+						log.WithError(fmt.Errorf(logs)).Fatal("supervisor run error with unexpected exit code")
+					}
 				}
 				log.WithError(err).Error("supervisor run error")
 				return
@@ -194,4 +221,42 @@ func (l *shutdownLoggerImpl) TerminateSync(ctx context.Context, pid int) {
 			l.write(fmt.Sprintf("Terminating main process errored: %s", err))
 		}
 	}
+}
+
+// extractFailureFromLogs attempts to extract the last error message from `supervisor run` command
+func extractFailureFromRun() string {
+	logs, err := os.ReadFile("/dev/termination-log")
+	if err != nil {
+		return ""
+	}
+	var sep = []byte("\n")
+	var msg struct {
+		Error   string `json:"error"`
+		Message string `json:"message"`
+	}
+
+	var nidx int
+	for idx := bytes.LastIndex(logs, sep); idx > 0; idx = nidx {
+		nidx = bytes.LastIndex(logs[:idx], sep)
+		if nidx < 0 {
+			nidx = 0
+		}
+
+		line := logs[nidx:idx]
+		err := json.Unmarshal(line, &msg)
+		if err != nil {
+			continue
+		}
+
+		if msg.Message == "" {
+			continue
+		}
+
+		if msg.Error == "" {
+			return msg.Message
+		}
+
+		return msg.Message + ": " + msg.Error
+	}
+	return string(logs)
 }
