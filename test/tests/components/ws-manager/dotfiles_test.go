@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package wsmanager
 
@@ -29,10 +29,10 @@ func TestDotfiles(t *testing.T) {
 	integration.SkipWithoutUsername(t, username)
 	integration.SkipWithoutUserToken(t, userToken)
 
-	f := features.New("dotfiles").WithLabel("component", "ws-manager").Assess("ensure dotfiles are loaded", func(_ context.Context, t *testing.T, cfg *envconf.Config) context.Context {
+	f := features.New("dotfiles").WithLabel("component", "ws-manager").Assess("ensure dotfiles are loaded", func(testCtx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 		t.Parallel()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		ctx, cancel := context.WithTimeout(testCtx, 5*time.Minute)
 		defer cancel()
 
 		api := integration.NewComponentAPI(ctx, cfg.Namespace(), kubeconfig, cfg.Client())
@@ -51,6 +51,7 @@ func TestDotfiles(t *testing.T) {
 			"function:getOpenPorts",
 			"function:guessGitTokenScopes",
 			"function:getWorkspace",
+			"function:trackEvent",
 			"resource:token::*::get",
 		})
 		if err != nil {
@@ -69,7 +70,7 @@ func TestDotfiles(t *testing.T) {
 						"token": "%v",
 						"kind": "gitpod",
 						"host": "%v",
-						"scope": ["function:getToken", "function:openPort", "function:getOpenPorts", "function:guessGitTokenScopes", "getWorkspace", "resource:token::*::get"],
+						"scope": ["function:getToken", "function:openPort", "function:getOpenPorts", "function:guessGitTokenScopes", "function:getWorkspace", "function:trackEvent", "resource:token::*::get"],
 						"expiryDate": "2022-10-26T10:38:05.232Z",
 						"reuse": 4
 					}]`, tokenId, getHostUrl(ctx, t, cfg.Client(), cfg.Namespace())),
@@ -123,7 +124,7 @@ func TestDotfiles(t *testing.T) {
 
 		assertDotfiles(t, rsa)
 
-		return ctx
+		return testCtx
 	}).Feature()
 
 	testEnv.Test(t, f)

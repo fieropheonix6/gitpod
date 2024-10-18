@@ -1,7 +1,7 @@
 /**
- * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
+ * Copyright (c) 2024 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 // package: iws
@@ -32,8 +32,6 @@ export namespace PrepareForUserNSRequest {
 export class PrepareForUserNSResponse extends jspb.Message {
     getFsShift(): FSShiftMethod;
     setFsShift(value: FSShiftMethod): PrepareForUserNSResponse;
-    getFullWorkspaceBackup(): boolean;
-    setFullWorkspaceBackup(value: boolean): PrepareForUserNSResponse;
     getPersistentVolumeClaim(): boolean;
     setPersistentVolumeClaim(value: boolean): PrepareForUserNSResponse;
 
@@ -50,7 +48,6 @@ export class PrepareForUserNSResponse extends jspb.Message {
 export namespace PrepareForUserNSResponse {
     export type AsObject = {
         fsShift: FSShiftMethod,
-        fullWorkspaceBackup: boolean,
         persistentVolumeClaim: boolean,
     }
 }
@@ -248,6 +245,92 @@ export namespace UmountProcResponse {
     }
 }
 
+export class MountNfsRequest extends jspb.Message {
+    getSource(): string;
+    setSource(value: string): MountNfsRequest;
+    getTarget(): string;
+    setTarget(value: string): MountNfsRequest;
+    getArgs(): string;
+    setArgs(value: string): MountNfsRequest;
+    getPid(): number;
+    setPid(value: number): MountNfsRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): MountNfsRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: MountNfsRequest): MountNfsRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: MountNfsRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): MountNfsRequest;
+    static deserializeBinaryFromReader(message: MountNfsRequest, reader: jspb.BinaryReader): MountNfsRequest;
+}
+
+export namespace MountNfsRequest {
+    export type AsObject = {
+        source: string,
+        target: string,
+        args: string,
+        pid: number,
+    }
+}
+
+export class MountNfsResponse extends jspb.Message {
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): MountNfsResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: MountNfsResponse): MountNfsResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: MountNfsResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): MountNfsResponse;
+    static deserializeBinaryFromReader(message: MountNfsResponse, reader: jspb.BinaryReader): MountNfsResponse;
+}
+
+export namespace MountNfsResponse {
+    export type AsObject = {
+    }
+}
+
+export class UmountNfsRequest extends jspb.Message {
+    getTarget(): string;
+    setTarget(value: string): UmountNfsRequest;
+    getPid(): number;
+    setPid(value: number): UmountNfsRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): UmountNfsRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: UmountNfsRequest): UmountNfsRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: UmountNfsRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): UmountNfsRequest;
+    static deserializeBinaryFromReader(message: UmountNfsRequest, reader: jspb.BinaryReader): UmountNfsRequest;
+}
+
+export namespace UmountNfsRequest {
+    export type AsObject = {
+        target: string,
+        pid: number,
+    }
+}
+
+export class UmountNfsResponse extends jspb.Message {
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): UmountNfsResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: UmountNfsResponse): UmountNfsResponse.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: UmountNfsResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): UmountNfsResponse;
+    static deserializeBinaryFromReader(message: UmountNfsResponse, reader: jspb.BinaryReader): UmountNfsResponse;
+}
+
+export namespace UmountNfsResponse {
+    export type AsObject = {
+    }
+}
+
 export class TeardownRequest extends jspb.Message {
 
     serializeBinary(): Uint8Array;
@@ -439,5 +522,4 @@ export namespace Memory {
 
 export enum FSShiftMethod {
     SHIFTFS = 0,
-    FUSE = 1,
 }

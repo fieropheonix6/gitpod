@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package dbtest
 
@@ -20,7 +20,7 @@ func NewStripeCustomer(t *testing.T, customer db.StripeCustomer) db.StripeCustom
 
 	result := db.StripeCustomer{
 		StripeCustomerID: fmt.Sprintf("cus_%s", uuid.New().String()),
-		AttributionID:    db.NewUserAttributionID(uuid.New().String()),
+		AttributionID:    db.NewTeamAttributionID(uuid.New().String()),
 		CreationTime:     db.NewVarCharTime(time.Now()),
 	}
 

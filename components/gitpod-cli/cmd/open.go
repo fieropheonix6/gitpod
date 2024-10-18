@@ -1,20 +1,21 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
 import (
-	"context"
-	"log"
 	"os"
 	"os/exec"
+	"time"
 
-	supervisorClient "github.com/gitpod-io/gitpod/gitpod-cli/pkg/supervisor-helper"
+	"github.com/gitpod-io/gitpod/gitpod-cli/pkg/supervisor"
+
+	"context"
 
 	"github.com/google/shlex"
 	"github.com/spf13/cobra"
-	"golang.org/x/sys/unix"
+	"golang.org/x/xerrors"
 )
 
 // initCmd represents the init command
@@ -22,43 +23,46 @@ var openCmd = &cobra.Command{
 	Use:   "open <filename>",
 	Short: "Opens a file in Gitpod",
 	Args:  cobra.MinimumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		// TODO(ak) use NotificationService.NotifyActive supervisor API instead
 
-		ctx := context.Background()
-		err := supervisorClient.WaitForIDEReady(ctx)
+		ctx, cancel := context.WithTimeout(cmd.Context(), 5*time.Second)
+		defer cancel()
+
+		client, err := supervisor.New(ctx)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
+		defer client.Close()
+
+		client.WaitForIDEReady(ctx)
 
 		wait, _ := cmd.Flags().GetBool("wait")
 
 		pcmd := os.Getenv("GP_OPEN_EDITOR")
 		if pcmd == "" {
-			log.Fatal("GP_OPEN_EDITOR is not set")
-			return
+			return xerrors.Errorf("GP_OPEN_EDITOR is not set")
 		}
 		pargs, err := shlex.Split(pcmd)
 		if err != nil {
-			log.Fatalf("cannot parse GP_OPEN_EDITOR: %v", err)
-			return
+			return xerrors.Errorf("cannot parse GP_OPEN_EDITOR: %w", err)
 		}
 		if len(pargs) > 1 {
 			pcmd = pargs[0]
 		}
 		pcmd, err = exec.LookPath(pcmd)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		if wait {
 			pargs = append(pargs, "--wait")
 		}
-
-		err = unix.Exec(pcmd, append(pargs, args...), os.Environ())
-		if err != nil {
-			log.Fatal(err)
-		}
+		c := exec.CommandContext(cmd.Context(), pcmd, append(pargs[1:], args...)...)
+		c.Stdin = os.Stdin
+		c.Stdout = os.Stdout
+		c.Stderr = os.Stderr
+		return c.Run()
 	},
 }
 

@@ -1,7 +1,7 @@
 /**
- * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
+ * Copyright (c) 2024 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 // package: builder
@@ -219,6 +219,10 @@ export class BuildRequest extends jspb.Message {
     setForceRebuild(value: boolean): BuildRequest;
     getTriggeredBy(): string;
     setTriggeredBy(value: string): BuildRequest;
+    getSupervisorRef(): string;
+    setSupervisorRef(value: string): BuildRequest;
+    getBaseImageNameResolved(): string;
+    setBaseImageNameResolved(value: string): BuildRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): BuildRequest.AsObject;
@@ -236,6 +240,8 @@ export namespace BuildRequest {
         auth?: BuildRegistryAuth.AsObject,
         forceRebuild: boolean,
         triggeredBy: string,
+        supervisorRef: string,
+        baseImageNameResolved: string,
     }
 }
 

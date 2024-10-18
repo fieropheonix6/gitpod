@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package config
 
@@ -51,9 +51,6 @@ type ConfigVersion interface {
 	// CheckDeprecated checks for deprecated config params.
 	// Returns key/value pair of deprecated params/values and any error messages (used for conflicting params)
 	CheckDeprecated(cfg interface{}) (map[string]interface{}, []string)
-
-	// BuildFromEnvvars builds the configuration file from assigned envvars
-	BuildFromEnvvars(cfg interface{}) error
 }
 
 // AddVersion adds a new version.

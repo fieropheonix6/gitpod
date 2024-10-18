@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { injectable, inject } from "inversify";
-import * as express from "express";
+import express from "express";
 import * as prom from "prom-client";
 import { Config } from "../config";
 import { log } from "@gitpod/gitpod-protocol/lib/util/logging";

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package pkg
 
@@ -30,7 +30,6 @@ func createFrontend(backendURL string, isDisabledCache bool) (*httptest.Server, 
 	proxy.ModifyResponse = openVSXProxy.ModifyResponse
 	handler := http.HandlerFunc(openVSXProxy.Handler(proxy))
 	frontend := httptest.NewServer(handler)
-	cfg.URLLocal = frontend.URL
 	return frontend, openVSXProxy
 }
 

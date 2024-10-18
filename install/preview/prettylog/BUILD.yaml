@@ -1,12 +1,10 @@
 # Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 # Licensed under the GNU Affero General Public License (AGPL).
-# See License-AGPL.txt in the project root for license information.
+# See License.AGPL.txt in the project root for license information.
 
 packages:
   - name: app
     type: go
-    argdeps:
-      - SEGMENT_IO_TOKEN
     srcs:
       - "main.go"
       - "go.sum"
@@ -15,11 +13,3 @@ packages:
       - CGO_ENABLED=0
     config:
       packaging: app
-      buildCommand:
-        [
-          "go",
-          "build",
-          "-trimpath",
-          "-ldflags",
-          "-buildid= -w -s -X 'main.segmentIOToken=${SEGMENT_IO_TOKEN}'",
-        ]

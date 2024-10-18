@@ -1,7 +1,7 @@
 /**
- * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
+ * Copyright (c) 2023 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 // package: contentservice
@@ -193,6 +193,8 @@ export class GitInitializer extends jspb.Message {
     clearConfig(): void;
     getConfig(): GitConfig | undefined;
     setConfig(value?: GitConfig): GitInitializer;
+    getFullClone(): boolean;
+    setFullClone(value: boolean): GitInitializer;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): GitInitializer.AsObject;
@@ -212,6 +214,7 @@ export namespace GitInitializer {
         cloneTaget: string,
         checkoutLocation: string,
         config?: GitConfig.AsObject,
+        fullClone: boolean,
     }
 }
 

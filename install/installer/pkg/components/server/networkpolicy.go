@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package server
 
@@ -36,12 +36,33 @@ func Networkpolicy(ctx *common.RenderContext, component string) ([]runtime.Objec
 								Protocol: common.TCPProtocol,
 								Port:     &intstr.IntOrString{IntVal: ContainerPort},
 							},
+							{
+								Protocol: common.TCPProtocol,
+								Port:     &intstr.IntOrString{IntVal: PublicAPIPort},
+							},
 						},
 						From: []networkingv1.NetworkPolicyPeer{
 							{
 								PodSelector: &metav1.LabelSelector{
 									MatchLabels: map[string]string{
 										"component": common.ProxyComponent,
+									},
+								},
+							},
+						},
+					},
+					{
+						Ports: []networkingv1.NetworkPolicyPort{
+							{
+								Protocol: common.TCPProtocol,
+								Port:     &intstr.IntOrString{IntVal: ContainerPort},
+							},
+						},
+						From: []networkingv1.NetworkPolicyPeer{
+							{
+								PodSelector: &metav1.LabelSelector{
+									MatchLabels: map[string]string{
+										"component": common.PublicApiComponent,
 									},
 								},
 							},
@@ -81,6 +102,50 @@ func Networkpolicy(ctx *common.RenderContext, component string) ([]runtime.Objec
 								PodSelector: &metav1.LabelSelector{
 									MatchLabels: map[string]string{
 										"component": gitpod.Component,
+									},
+								},
+							},
+						},
+					},
+					{
+						Ports: []networkingv1.NetworkPolicyPort{
+							{
+								Protocol: common.TCPProtocol,
+								Port:     &intstr.IntOrString{IntVal: IAMSessionPort},
+							},
+						},
+						From: []networkingv1.NetworkPolicyPeer{
+							{
+								PodSelector: &metav1.LabelSelector{
+									MatchLabels: map[string]string{
+										"app":       "gitpod",
+										"component": common.PublicApiComponent,
+									},
+								},
+							},
+						},
+					},
+					{
+						Ports: []networkingv1.NetworkPolicyPort{
+							{
+								Protocol: common.TCPProtocol,
+								Port:     &intstr.IntOrString{IntVal: GRPCAPIPort},
+							},
+						},
+						From: []networkingv1.NetworkPolicyPeer{
+							{
+								PodSelector: &metav1.LabelSelector{
+									MatchLabels: map[string]string{
+										"app":       "gitpod",
+										"component": common.PublicApiComponent,
+									},
+								},
+							},
+							{
+								PodSelector: &metav1.LabelSelector{
+									MatchLabels: map[string]string{
+										"app":       "gitpod",
+										"component": common.UsageComponent,
 									},
 								},
 							},

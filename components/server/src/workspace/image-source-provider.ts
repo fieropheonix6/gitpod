@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { injectable, inject } from "inversify";
@@ -37,7 +37,7 @@ export class ImageSourceProvider {
 
             const imgcfg = config.image;
             if (ExternalImageConfigFile.is(imgcfg)) {
-                // we're asked to pull the Dockerfile from a repo possibly different than the one we're opening a workspace for (e.g. definitely-gp).
+                // we're asked to pull the Dockerfile from a repo possibly different than the one we're opening a workspace for.
                 const repository = imgcfg.externalSource.repository;
                 const hostContext = this.hostContextProvider.get(repository.host);
                 if (!hostContext || !hostContext.services) {

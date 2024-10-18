@@ -1,11 +1,12 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
 import (
 	"context"
+
 	"github.com/cockroachdb/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -28,7 +29,7 @@ func newHasAccessCmd(logger *logrus.Logger) *cobra.Command {
 		},
 	}
 
-	cmd.PersistentFlags().StringSliceVar(&clusters, "clusters", []string{"dev", "harvester"}, "Comma separated list of cluster to check access for")
+	cmd.PersistentFlags().StringSliceVar(&clusters, "clusters", []string{""}, "Comma separated list of cluster to check access for")
 
 	return cmd
 }

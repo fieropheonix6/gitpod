@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
@@ -59,6 +59,7 @@ var proxyCmd = &cobra.Command{
 		}
 
 		auth := func() docker.Authorizer { return docker.NewDockerAuthorizer(docker.WithAuthCreds(authP.Authorize)) }
+		mirrorAuth := func() docker.Authorizer { return docker.NewDockerAuthorizer(docker.WithAuthCreds(authA.Authorize)) }
 		prx, err := proxy.NewProxy(&url.URL{Host: "localhost:8080", Scheme: "http"}, map[string]proxy.Repo{
 			"base": {
 				Host: reference.Domain(baseref),
@@ -72,7 +73,7 @@ var proxyCmd = &cobra.Command{
 				Tag:  targettag,
 				Auth: auth,
 			},
-		})
+		}, mirrorAuth)
 		if err != nil {
 			log.Fatal(err)
 		}

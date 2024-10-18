@@ -1,11 +1,13 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package io.gitpod.jetbrains.remote
 
 import com.intellij.codeWithMe.ClientId
 import com.intellij.ide.BrowserUtil
+import com.intellij.ide.CommandLineProcessor
+import com.intellij.openapi.client.ClientKind
 import com.intellij.openapi.client.ClientSession
 import com.intellij.openapi.client.ClientSessionsManager
 import com.intellij.openapi.components.service
@@ -25,7 +27,10 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.QueryStringDecoder
 import io.prometheus.client.exporter.common.TextFormat
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.ide.RestService
 import org.jetbrains.io.response
 import java.io.OutputStreamWriter
@@ -37,7 +42,6 @@ import java.util.*
 class GitpodCLIService : RestService() {
 
     private val manager = service<GitpodManager>()
-    private val cliHelperService = service<GitpodCLIHelper>()
 
     override fun getServiceName() = SERVICE_NAME
 
@@ -49,6 +53,9 @@ class GitpodCLIService : RestService() {
         /**
          * prod: curl http://localhost:63342/api/gitpod/cli?op=metrics
          * dev:  curl http://localhost:63343/api/gitpod/cli?op=metrics
+         *
+         * We will use this endpoint in JetBrains launcher to check if backend-plugin is ready.
+         * Please make sure this operation:metrics to respond 200
          */
         if (operation == "metrics") {
             val out = BufferExposingByteArrayOutputStream()
@@ -67,7 +74,7 @@ class GitpodCLIService : RestService() {
             val file = parseFilePath(fileStr) ?: return "invalid file"
             val shouldWait = getBooleanParameter("wait", urlDecoder)
             return withClient(request, context) {
-                cliHelperService.open(file, shouldWait)
+                CommandLineProcessor.doOpenFileOrProject(file, shouldWait).future.await()
             }
         }
         if (operation == "preview") {
@@ -109,7 +116,9 @@ class GitpodCLIService : RestService() {
         GlobalScope.launch {
             getClientSessionAndProjectAsync().let { (session, project) ->
                 ClientId.withClientId(session.clientId) {
-                    action(project)
+                    runBlocking {
+                        action(project)
+                    }
                     sendOk(request, context)
                 }
             }
@@ -124,10 +133,10 @@ class GitpodCLIService : RestService() {
         var session: ClientSession? = null
         while (session == null) {
             if (project != null) {
-                session = ClientSessionsManager.getProjectSessions(project, false).firstOrNull()
+                session = ClientSessionsManager.getProjectSessions(project, ClientKind.REMOTE).firstOrNull()
             }
             if (session == null) {
-                session = ClientSessionsManager.getAppSessions(false).firstOrNull()
+                session = ClientSessionsManager.getAppSessions(ClientKind.REMOTE).firstOrNull()
             }
             if (session == null) {
                 delay(1000L)

@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package io.gitpod.jetbrains.gateway
 
@@ -33,6 +33,15 @@ class GitpodSettingsState : PersistentStateComponent<GitpodSettingsState> {
                 return
             }
             field = gitpodHost
+            dispatcher.multicaster.didChange()
+        }
+
+    var forceHttpTunnel: Boolean = false
+        set(value) {
+            if (value == field) {
+                return
+            }
+            field = value
             dispatcher.multicaster.didChange()
         }
 

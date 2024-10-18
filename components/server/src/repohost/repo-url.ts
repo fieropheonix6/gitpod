@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { URL } from "url";
@@ -31,6 +31,10 @@ export namespace RepoURL {
             if (owner.startsWith("~")) {
                 repoKind = "users";
                 owner = owner.substring(1);
+            }
+            // Azure DevOps
+            if (owner.endsWith("/_git")) {
+                owner = owner.slice(0, -5);
             }
             const repo = endSegment.endsWith(".git") ? endSegment.slice(0, -4) : endSegment;
             return { host, owner, repo, repoKind };

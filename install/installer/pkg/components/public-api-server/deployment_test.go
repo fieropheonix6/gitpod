@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package public_api_server
 
@@ -56,6 +57,14 @@ func TestDeployment_ServerArguments(t *testing.T) {
 			},
 		},
 		{
+			Name: "database-config",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: "gcp-db-creds-service-account-name",
+				},
+			},
+		},
+		{
 			Name: "stripe-secret",
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
@@ -73,5 +82,13 @@ func TestDeployment_ServerArguments(t *testing.T) {
 				},
 			},
 		},
-	}, dpl.Spec.Template.Spec.Volumes, "must bind config as a volume")
+		{
+			Name: "auth-pki-signing",
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: "auth-pki",
+				},
+			},
+		},
+	}, dpl.Spec.Template.Spec.Volumes, "must bind volumes")
 }

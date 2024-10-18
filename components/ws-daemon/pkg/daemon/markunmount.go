@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package daemon
 
@@ -21,7 +21,6 @@ import (
 	"k8s.io/client-go/util/retry"
 
 	"github.com/gitpod-io/gitpod/common-go/log"
-	"github.com/gitpod-io/gitpod/ws-daemon/pkg/content"
 	"github.com/gitpod-io/gitpod/ws-daemon/pkg/dispatch"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -136,7 +135,7 @@ func unmountMark(instanceID string) error {
 		return xerrors.Errorf("cannot read /proc/mounts: %w", err)
 	}
 
-	dir := content.ServiceDirName(instanceID)
+	dir := instanceID + "-daemon"
 	path := fromPartialMount(filepath.Join(dir, "mark"), mounts)
 	// empty path means no mount found
 	if len(path) == 0 {
@@ -144,7 +143,10 @@ func unmountMark(instanceID string) error {
 	}
 
 	// in some scenarios we need to wait for the unmount
-	var errorFn = func(err error) bool {
+	var canRetryFn = func(err error) bool {
+		if !strings.Contains(err.Error(), "device or resource busy") {
+			log.WithError(err).WithFields(log.OWI("", "", instanceID)).Info("Will not retry unmount mark")
+		}
 		return strings.Contains(err.Error(), "device or resource busy")
 	}
 
@@ -158,7 +160,7 @@ func unmountMark(instanceID string) error {
 				Duration: 1 * time.Second,
 				Factor:   5.0,
 				Jitter:   0.1,
-			}, errorFn, func() error {
+			}, canRetryFn, func() error {
 				return unix.Unmount(p, 0)
 			})
 		})

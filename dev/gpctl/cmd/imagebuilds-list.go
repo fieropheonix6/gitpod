@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
@@ -27,6 +27,7 @@ var imagebuildsListCmd = &cobra.Command{
 			log.WithError(err).Fatal("cannot connect")
 		}
 		defer conn.Close()
+		log.Info("connected")
 
 		// build did start, print log until done
 		resp, err := client.ListBuilds(ctx, &builder.ListBuildsRequest{})

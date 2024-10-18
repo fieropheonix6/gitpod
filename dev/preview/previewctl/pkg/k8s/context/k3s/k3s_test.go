@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package k3s
 
@@ -83,7 +83,7 @@ users:
 					},
 					Clusters: map[string]*api.Cluster{
 						"k3s": {
-							Server:                   "https://k3s.kube.gitpod-dev.com:6443",
+							Server:                   "https://k3s.preview.gitpod-dev.com:6443",
 							CertificateAuthorityData: []byte("test_data"),
 							Extensions:               map[string]runtime.Object{},
 						},

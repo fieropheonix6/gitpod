@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package content_service
 
@@ -12,6 +12,7 @@ import (
 var Objects = common.CompositeRenderFunc(
 	configmap,
 	deployment,
+	pdb,
 	networkpolicy,
 	rolebinding,
 	common.GenerateService(Component, []common.ServicePort{

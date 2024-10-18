@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package dbtest
 
@@ -21,7 +21,7 @@ func NewUsage(t *testing.T, record db.Usage) db.Usage {
 
 	result := db.Usage{
 		ID:                  uuid.New(),
-		AttributionID:       db.NewUserAttributionID(uuid.New().String()),
+		AttributionID:       db.NewTeamAttributionID(uuid.New().String()),
 		Description:         "some description",
 		CreditCents:         42,
 		EffectiveTime:       db.VarcharTime{},

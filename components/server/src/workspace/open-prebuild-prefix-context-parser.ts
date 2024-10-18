@@ -1,12 +1,12 @@
 /**
  * Copyright (c) 2021 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { User, WorkspaceContext } from "@gitpod/gitpod-protocol";
 import { log } from "@gitpod/gitpod-protocol/lib/util/logging";
-import { OpenPrebuildContext } from "@gitpod/gitpod-protocol/src/protocol";
+import { OpenPrebuildContext } from "@gitpod/gitpod-protocol/lib/protocol";
 import { inject, injectable } from "inversify";
 import { Config } from "../config";
 import { IPrefixContextParser } from "./context-parser";

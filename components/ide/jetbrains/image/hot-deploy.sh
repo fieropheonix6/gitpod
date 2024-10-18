@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 # Licensed under the GNU Affero General Public License (AGPL).
-# See License-AGPL.txt in the project root for license information.
+# See License.AGPL.txt in the project root for license information.
 
 set -Eeuo pipefail
 
@@ -37,7 +37,7 @@ docker ps &> /dev/null || (echo "You need a working Docker daemon. Maybe set DOC
 IDE_VERSIONS_JSON=$(bash "$ROOT_DIR/components/ide/jetbrains/image/resolve-latest-ide-version.sh" "$product_code")
 IDE_BUILD_VERSION=$(echo "$IDE_VERSIONS_JSON" | jq -r .IDE_BUILD_VERSION)
 IDE_VERSION=$(echo "$IDE_VERSIONS_JSON" | jq -r .IDE_VERSION)
-leeway build -Dversion="$version" -DimageRepoBase=eu.gcr.io/gitpod-core-dev/build -DbuildNumber="$IDE_BUILD_VERSION" -DjbBackendVersion="$IDE_VERSION" ".:$component" --save "$bldfn"
+leeway build -Dversion="$version" -DimageRepoBase=eu.gcr.io/gitpod-dev-artifact/build -DbuildNumber="$IDE_BUILD_VERSION" -DjbBackendVersion="$IDE_VERSION" ".:$component" --save "$bldfn"
 dev_image="$(tar xfO "$bldfn" ./imgnames.txt | head -n1)"
 echo "Dev Image: $dev_image"
 

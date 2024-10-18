@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package orchestrator
 
@@ -232,7 +232,7 @@ func extractBuildResponse(status *wsmanapi.WorkspaceStatus) *api.BuildResponse {
 		info = extractBuildStatus(status)
 		msg  = status.Message
 	)
-	if status.Phase == wsmanapi.WorkspacePhase_STOPPING {
+	if status.Phase == wsmanapi.WorkspacePhase_STOPPING || status.Phase == wsmanapi.WorkspacePhase_STOPPED {
 		if status.Conditions.Failed != "" {
 			msg = status.Conditions.Failed
 		} else if status.Conditions.HeadlessTaskFailed != "" {

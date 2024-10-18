@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
@@ -31,7 +32,7 @@ var configNodeContainerdCmd = &cobra.Command{
 		log.Infof("containerd socket location detected as %s", *socket)
 
 		cfg.Workspace.Runtime.ContainerDRuntimeDir = containerd.String()
-		cfg.Workspace.Runtime.ContainerDSocket = socket.String()
+		cfg.Workspace.Runtime.ContainerDSocketDir = socket.String()
 
 		return saveConfigFile(cfg)
 	},

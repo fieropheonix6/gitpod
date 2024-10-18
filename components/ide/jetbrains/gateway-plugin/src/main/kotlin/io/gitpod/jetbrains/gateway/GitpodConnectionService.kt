@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package io.gitpod.jetbrains.gateway
 
@@ -11,8 +11,8 @@ import com.intellij.openapi.extensions.PluginId
 import com.intellij.remoteDev.util.onTerminationOrNow
 import com.intellij.util.ExceptionUtil
 import com.intellij.util.io.DigestUtil
+import com.intellij.util.net.JdkProxyProvider
 import com.intellij.util.net.ssl.CertificateManager
-import com.intellij.util.proxy.CommonProxy
 import com.jetbrains.rd.util.concurrentMapOf
 import com.jetbrains.rd.util.lifetime.Lifetime
 import io.gitpod.gitpodprotocol.api.GitpodServerLauncher
@@ -50,7 +50,7 @@ class GitpodConnectionService {
                     val originalClassLoader = Thread.currentThread().contextClassLoader
                     val connection = try {
                         val origin = "https://$gitpodHost/"
-                        val proxies = CommonProxy.getInstance().select(URL(origin))
+                        val proxies = JdkProxyProvider.getInstance().proxySelector.select(URL(origin).toURI())
                         val sslContext = CertificateManager.getInstance().sslContext
 
                         // see https://intellij-support.jetbrains.com/hc/en-us/community/posts/360003146180/comments/360000376240

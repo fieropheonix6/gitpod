@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package public_api_server
 
@@ -13,6 +14,7 @@ func Objects(ctx *common.RenderContext) ([]runtime.Object, error) {
 		configmap,
 		deployment,
 		rolebinding,
+		pdb,
 		common.DefaultServiceAccount(Component),
 		service,
 		networkpolicy,

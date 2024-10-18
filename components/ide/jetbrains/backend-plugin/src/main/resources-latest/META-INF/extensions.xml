@@ -1,30 +1,15 @@
 <!--
  Copyright (c) 2022 Gitpod GmbH. All rights reserved.
  Licensed under the GNU Affero General Public License (AGPL).
- See License-AGPL.txt in the project root for license information.
+ See License.AGPL.txt in the project root for license information.
 -->
 <!--suppress PluginXmlValidity -->
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceInterface="io.gitpod.jetbrains.remote.GitpodIgnoredPortsForNotificationService" serviceImplementation="io.gitpod.jetbrains.remote.latest.GitpodIgnoredPortsForNotificationServiceImpl" preload="true"/>
-        <applicationService serviceInterface="io.gitpod.jetbrains.remote.GitpodCLIHelper" serviceImplementation="io.gitpod.jetbrains.remote.latest.GitpodCLIHelperImpl"/>
-        <applicationService serviceInterface="io.gitpod.jetbrains.remote.GitpodPortForwardingService" serviceImplementation="io.gitpod.jetbrains.remote.latest.GitpodPortForwardingServiceImpl" client="controller" preload="true"/>
-        <projectService serviceImplementation="io.gitpod.jetbrains.remote.GitpodClientProjectSessionTracker" client="controller" preload="true"/>
-        <projectService serviceImplementation="io.gitpod.jetbrains.remote.GitpodTerminalService" client="controller" preload="true"/>
+        <applicationService serviceInterface="io.gitpod.jetbrains.remote.GitpodPortForwardingService"
+                            serviceImplementation="io.gitpod.jetbrains.remote.latest.GitpodPortForwardingServiceImpl"
+                            client="controller" preload="true"/>
+        <gateway.customization.performance id="gitpodMetricsControl" order="before cpuControl"
+                                           implementation="io.gitpod.jetbrains.remote.latest.GitpodMetricControlProvider"/>
     </extensions>
-    <actions>
-        <action id="io.gitpod.jetbrains.remote.latest.GitpodCopyUrlAction"
-                class="io.gitpod.jetbrains.remote.latest.GitpodCopyUrlAction"
-                text="Copy URL"
-                icon="AllIcons.Actions.Copy">
-            <add-to-group group-id="PortForwardingPortGroup" anchor="last"/>
-        </action>
-        <action id="io.gitpod.jetbrains.remote.latest.GitpodCopyWebUrlAction"
-                class="io.gitpod.jetbrains.remote.latest.GitpodCopyWebUrlAction"
-                text="Copy Web URL"
-                icon="AllIcons.Actions.Copy">
-            <add-to-group group-id="PortForwardingPortGroup" anchor="last"/>
-            <add-to-group group-id="PortForwardingSuggestionGroup" anchor="last"/>
-        </action>
-    </actions>
 </idea-plugin>
