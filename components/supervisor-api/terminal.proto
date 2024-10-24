@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 syntax = "proto3";
 
@@ -88,6 +88,7 @@ message OpenTerminalResponse {
 
 message ShutdownTerminalRequest {
     string alias = 1;
+    bool force_success = 2;
 }
 message ShutdownTerminalResponse {}
 

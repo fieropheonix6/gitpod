@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 const REGEX_WORKSPACE_ID = /[0-9a-z]{2,16}-[0-9a-z]{2,16}-[0-9a-z]{8,11}/;
@@ -33,7 +33,7 @@ export const parseWorkspaceIdFromHostname = function (hostname: string) {
     }
 };
 
-/** Equalls UUIDv4 (and REGEX_WORKSPACE_ID_LEGACY!) */
+/** Equals UUIDv4 (and REGEX_WORKSPACE_ID_LEGACY!) */
 const REGEX_INSTANCE_ID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/;
 const REGEX_INSTANCE_ID_EXACT = new RegExp(`^${REGEX_INSTANCE_ID.source}$`);
 
@@ -49,6 +49,10 @@ export const matchesInstanceIdOrLegacyWorkspaceIdExactly = function (maybeId: st
  * @param maybeWorkspaceId
  * @returns
  */
-export const matchesNewWorkspaceIdExactly = function (maybeWorkspaceId: string): boolean {
+export const matchesNewWorkspaceIdExactly = function (maybeWorkspaceId?: string): boolean {
+    if (!maybeWorkspaceId) {
+        return false;
+    }
+
     return REGEX_WORKSPACE_ID_EXACT.test(maybeWorkspaceId);
 };

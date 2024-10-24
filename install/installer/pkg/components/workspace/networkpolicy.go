@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package workspace
 
@@ -21,7 +21,7 @@ func networkpolicy(ctx *common.RenderContext) ([]runtime.Object, error) {
 	labels := common.DefaultLabels(Component)
 
 	podSelectorLabels := map[string]string{
-		"app":                     common.AppName,
+		"app":                     "gitpod",
 		"component":               Component,
 		"gitpod.io/networkpolicy": "default",
 	}

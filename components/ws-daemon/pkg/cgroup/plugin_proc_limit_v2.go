@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cgroup
 
@@ -57,7 +57,7 @@ func (c *ProcLimiterV2) Apply(ctx context.Context, opts *PluginOptions) error {
 
 		_, err := v2.NewManager(opts.BasePath, filepath.Join("/", opts.CgroupPath), c.limits)
 		if err != nil {
-			log.WithError(err).WithField("basePath", opts.BasePath).WithField("cgroupPath", opts.CgroupPath).WithField("limits", c.limits).Error("cannot write proc limits")
+			log.WithError(err).WithFields(log.OWI("", "", opts.InstanceId)).WithField("basePath", opts.BasePath).WithField("cgroupPath", opts.CgroupPath).WithField("limits", c.limits).Error("cannot write proc limits")
 		}
 
 		for {
@@ -65,7 +65,7 @@ func (c *ProcLimiterV2) Apply(ctx context.Context, opts *PluginOptions) error {
 			case <-update:
 				_, err := v2.NewManager(opts.BasePath, filepath.Join("/", opts.CgroupPath), c.limits)
 				if err != nil {
-					log.WithError(err).WithField("basePath", opts.BasePath).WithField("cgroupPath", opts.CgroupPath).WithField("limits", c.limits).Error("cannot write proc limits")
+					log.WithError(err).WithFields(log.OWI("", "", opts.InstanceId)).WithField("basePath", opts.BasePath).WithField("cgroupPath", opts.CgroupPath).WithField("limits", c.limits).Error("cannot write proc limits")
 				}
 			case <-ctx.Done():
 				return

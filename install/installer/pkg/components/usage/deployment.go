@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package usage
 
@@ -63,6 +64,7 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 		return nil
 	})
 
+	//nolint:typecheck
 	configHash, err := common.ObjectHash(configmap(ctx))
 	if err != nil {
 		return nil, err
@@ -93,13 +95,14 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 						Annotations: common.CustomizeAnnotation(ctx, Component, common.TypeMetaDeployment),
 					},
 					Spec: corev1.PodSpec{
-						Affinity:                      common.NodeAffinity(cluster.AffinityLabelMeta),
+						Affinity:                      cluster.WithNodeAffinityHostnameAntiAffinity(Component, cluster.AffinityLabelMeta),
+						TopologySpreadConstraints:     cluster.WithHostnameTopologySpread(Component),
 						ServiceAccountName:            Component,
 						EnableServiceLinks:            pointer.Bool(false),
-						DNSPolicy:                     "ClusterFirst",
-						RestartPolicy:                 "Always",
+						DNSPolicy:                     corev1.DNSClusterFirst,
+						RestartPolicy:                 corev1.RestartPolicyAlways,
 						TerminationGracePeriodSeconds: pointer.Int64(30),
-						InitContainers:                []corev1.Container{*common.DatabaseWaiterContainer(ctx)},
+						InitContainers:                []corev1.Container{*common.DatabaseMigrationWaiterContainer(ctx)},
 						Volumes:                       volumes,
 						Containers: []corev1.Container{{
 							Name:            Component,

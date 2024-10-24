@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package netlimit
 
@@ -123,8 +123,6 @@ func (n *ConnLimiter) GetConnectionDropCounter(pid uint64) (*nftables.CounterObj
 }
 
 func (c *ConnLimiter) limitWorkspace(ctx context.Context, ws *dispatch.Workspace) error {
-	log.WithFields(ws.OWI()).Infof("will limit network connections")
-
 	disp := dispatch.GetFromContext(ctx)
 	if disp == nil {
 		return fmt.Errorf("no dispatch available")
@@ -157,7 +155,7 @@ func (c *ConnLimiter) limitWorkspace(ctx context.Context, ws *dispatch.Workspace
 			case <-ticker.C:
 				counter, err := c.GetConnectionDropCounter(pid)
 				if err != nil {
-					log.WithError(err).Errorf("could not get connection drop stats for %s", ws.WorkspaceID)
+					log.WithFields(ws.OWI()).WithError(err).Warnf("could not get connection drop stats")
 					continue
 				}
 

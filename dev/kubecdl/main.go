@@ -1,12 +1,13 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package main
 
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -50,6 +51,14 @@ func main() {
 		if err != nil {
 			logrus.Fatal(err)
 		}
+
+		if _, err := os.Stat(filepath.Join(home, ".kube")); errors.Is(err, os.ErrNotExist) {
+			err := os.Mkdir(filepath.Join(home, ".kube"), os.ModePerm)
+			if err != nil {
+				logrus.Fatal(err)
+			}
+		}
+
 		kubecfgfn = filepath.Join(home, ".kube", "config")
 	}
 

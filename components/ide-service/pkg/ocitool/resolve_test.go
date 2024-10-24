@@ -1,12 +1,14 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package oci_tool
 
 import (
 	"context"
 	"testing"
+
+	"github.com/containerd/containerd/remotes/docker"
 )
 
 func TestResolveIDEVersion(t *testing.T) {
@@ -38,7 +40,8 @@ func TestResolveIDEVersion(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ResolveIDEVersion(context.TODO(), tt.args.ref)
+
+			got, err := ResolveIDEVersion(context.TODO(), docker.NewResolver(docker.ResolverOptions{}), tt.args.ref)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ResolveIDEVersion() error = %v, wantErr %v", err, tt.wantErr)
 				return

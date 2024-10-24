@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2020 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { injectable, interfaces } from "inversify";
@@ -10,6 +10,7 @@ import { gitlabContainerModule } from "../gitlab/gitlab-container-module";
 import { genericAuthContainerModule } from "./oauth-container-module";
 import { bitbucketContainerModule } from "../bitbucket/bitbucket-container-module";
 import { bitbucketServerContainerModule } from "../bitbucket-server/bitbucket-server-container-module";
+import { azureDevOpsContainerModule } from "../azure-devops/azure-container-module";
 
 @injectable()
 export class HostContainerMapping {
@@ -25,6 +26,8 @@ export class HostContainerMapping {
                 return [bitbucketContainerModule];
             case "BitbucketServer":
                 return [bitbucketServerContainerModule];
+            case "AzureDevOps":
+                return [azureDevOpsContainerModule];
             default:
                 return undefined;
         }

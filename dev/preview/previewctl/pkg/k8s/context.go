@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package k8s
 
@@ -98,4 +98,14 @@ func OutputContext(kubeConfigSavePath string, config *api.Config) error {
 	fmt.Println(string(bytes))
 
 	return err
+}
+
+func DeleteContext(config *api.Config, name string) {
+	_, exists := config.Contexts[name]
+	if !exists {
+		return
+	}
+
+	delete(config.Contexts, name)
+	delete(config.Clusters, name)
 }

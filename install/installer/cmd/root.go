@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
@@ -57,7 +57,7 @@ func setSeed() {
 		rand.Seed(rootOpts.SeedValue)
 
 		// crypto/rand is used by the bcrypt package to generate its random values
-		str, err := common.RandomString(64)
+		str, err := common.RandomString(128)
 		if err != nil {
 			panic(err)
 		}

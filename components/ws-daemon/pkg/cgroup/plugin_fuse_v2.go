@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cgroup
 
@@ -18,12 +18,21 @@ import (
 	"github.com/gitpod-io/gitpod/common-go/log"
 )
 
+var (
+	fuseDeviceMajor int64 = 10
+	fuseDeviceMinor int64 = 229
+)
+
 type FuseDeviceEnablerV2 struct{}
 
 func (c *FuseDeviceEnablerV2) Name() string  { return "fuse-device-enabler-v2" }
 func (c *FuseDeviceEnablerV2) Type() Version { return Version2 }
 
 func (c *FuseDeviceEnablerV2) Apply(ctx context.Context, opts *PluginOptions) error {
+	if val, ok := opts.Annotations["gitpod.io/fuse-device"]; ok && val == "false" {
+		return nil
+	}
+
 	fullCgroupPath := filepath.Join(opts.BasePath, opts.CgroupPath)
 	log.WithField("cgroupPath", fullCgroupPath).Debug("configuring devices")
 

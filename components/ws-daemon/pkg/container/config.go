@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package container
 
@@ -35,6 +35,8 @@ type Config struct {
 
 	// Containerd contains the containerd CRI config if runtime == RuntimeContainerd
 	Containerd *ContainerdConfig `json:"containerd,omitempty"`
+
+	RegistryFacadeHost string `json:"registryFacadeHost,omitempty"`
 }
 
 // RuntimeType lists the supported container runtimes
@@ -58,17 +60,12 @@ func FromConfig(cfg *Config) (rt Runtime, err error) {
 		return
 	}
 
-	mounts, err := NewNodeMountsLookup(&cfg.Mounts)
-	if err != nil {
-		return nil, err
-	}
-
 	switch cfg.Runtime {
 	case RuntimeContainerd:
 		if cfg.Containerd == nil {
 			return nil, xerrors.Errorf("runtime is set to containerd, but not containerd config is provided")
 		}
-		return NewContainerd(cfg.Containerd, mounts, cfg.Mapping)
+		return NewContainerd(cfg.Containerd, cfg.Mapping, cfg.RegistryFacadeHost)
 	default:
 		return nil, xerrors.Errorf("unknown runtime type: %s", cfg.Runtime)
 	}

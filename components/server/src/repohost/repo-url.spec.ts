@@ -1,11 +1,11 @@
 /**
  * Copyright (c) 2021 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import * as chai from "chai";
-import { suite, test } from "mocha-typescript";
+import { suite, test } from "@testdeck/mocha";
 import { RepoURL } from "./repo-url";
 
 const expect = chai.expect;
@@ -80,6 +80,17 @@ export class RepoUrlTest {
             repoKind: "projects",
             owner: "proj",
             repo: "repoName",
+        });
+    }
+
+    @test public parseAzureScmUrl() {
+        const testUrl = RepoURL.parseRepoUrl(
+            "https://services-azure@dev.azure.com/services-azure/open-to-edit-project/_git/repo2.kai.klasen.git",
+        );
+        expect(testUrl).to.deep.include({
+            host: "dev.azure.com",
+            owner: "services-azure/open-to-edit-project",
+            repo: "repo2.kai.klasen",
         });
     }
 }

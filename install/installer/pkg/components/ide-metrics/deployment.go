@@ -1,13 +1,12 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package ide_metrics
 
 import (
 	"github.com/gitpod-io/gitpod/installer/pkg/cluster"
 	"github.com/gitpod-io/gitpod/installer/pkg/common"
-	"github.com/gitpod-io/gitpod/installer/pkg/config/v1/experimental"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -21,6 +20,7 @@ import (
 func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 	labels := common.CustomizeLabel(ctx, Component, common.TypeMetaDeployment)
 
+	//nolint:typecheck
 	configHash, err := common.ObjectHash(configmap(ctx))
 	if err != nil {
 		return nil, err
@@ -48,18 +48,12 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 		common.DefaultEnv(&ctx.Config),
 	))
 
-	_ = ctx.WithExperimental(func(cfg *experimental.Config) error {
-		if cfg.IDE != nil && cfg.IDE.IDEMetricsConfig != nil {
-			if cfg.IDE.IDEMetricsConfig.EnabledErrorReporting {
-				env = append(env, corev1.EnvVar{
-					Name:  "GITPOD_ENABLED_ERROR_REPORTING",
-					Value: "true",
-				})
-			}
-
-		}
-		return nil
-	})
+	if ctx.Config.Components != nil && ctx.Config.Components.IDE != nil && ctx.Config.Components.IDE.Metrics != nil && ctx.Config.Components.IDE.Metrics.ErrorReportingEnabled {
+		env = append(env, corev1.EnvVar{
+			Name:  "GITPOD_ENABLED_ERROR_REPORTING",
+			Value: "true",
+		})
+	}
 
 	return []runtime.Object{
 		&appsv1.Deployment{
@@ -86,11 +80,12 @@ func deployment(ctx *common.RenderContext) ([]runtime.Object, error) {
 						}),
 					},
 					Spec: corev1.PodSpec{
-						Affinity:                      common.NodeAffinity(cluster.AffinityLabelMeta),
+						Affinity:                      cluster.WithNodeAffinityHostnameAntiAffinity(Component, cluster.AffinityLabelMeta),
+						TopologySpreadConstraints:     cluster.WithHostnameTopologySpread(Component),
 						ServiceAccountName:            Component,
 						EnableServiceLinks:            pointer.Bool(false),
-						DNSPolicy:                     "ClusterFirst",
-						RestartPolicy:                 "Always",
+						DNSPolicy:                     corev1.DNSClusterFirst,
+						RestartPolicy:                 corev1.RestartPolicyAlways,
 						TerminationGracePeriodSeconds: pointer.Int64(30),
 						Containers: []corev1.Container{{
 							Args:            []string{"run", "--config", "/config/config.json"},

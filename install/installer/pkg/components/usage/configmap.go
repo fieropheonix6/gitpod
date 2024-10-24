@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package usage
 
@@ -13,6 +14,7 @@ import (
 
 	db "github.com/gitpod-io/gitpod/components/gitpod-db/go"
 	"github.com/gitpod-io/gitpod/installer/pkg/common"
+	"github.com/gitpod-io/gitpod/installer/pkg/components/redis"
 	"github.com/gitpod-io/gitpod/installer/pkg/config/v1/experimental"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -36,9 +38,14 @@ func configmap(ctx *common.RenderContext) ([]runtime.Object, error) {
 			ForUsers:            1_000_000_000,
 			MinForUsersOnStripe: 0,
 		},
+		Redis: server.RedisConfiguration{
+			Address: common.ClusterAddress(redis.Component, ctx.Namespace, redis.Port),
+		},
+		ServerAddress: common.ClusterAddress(common.ServerComponent, ctx.Namespace, common.ServerGRPCAPIPort),
+		GitpodHost:    "https://" + ctx.Config.Domain,
 	}
 
-	expWebAppConfig := getExperimentalWebAppConfig(ctx)
+	expWebAppConfig := common.ExperimentalWebappConfig(ctx)
 	if expWebAppConfig != nil && expWebAppConfig.Stripe != nil {
 		cfg.StripePrices = stripe.StripePrices{
 			IndividualUsagePriceIDs: stripe.PriceConfig{

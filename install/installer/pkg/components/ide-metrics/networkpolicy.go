@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package ide_metrics
 
@@ -40,6 +40,10 @@ func networkpolicy(ctx *common.RenderContext) ([]runtime.Object, error) {
 				}, {
 					PodSelector: &metav1.LabelSelector{MatchLabels: map[string]string{
 						"component": ideproxy.Component,
+					}},
+				}, {
+					PodSelector: &metav1.LabelSelector{MatchLabels: map[string]string{
+						"component": common.DashboardComponent,
 					}},
 				}},
 			}},

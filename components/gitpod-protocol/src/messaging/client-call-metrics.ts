@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2021 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
 import { injectable } from "inversify";
@@ -47,6 +47,14 @@ export class PrometheusClientCallMetrics implements IClientCallMetrics {
             labelNames: ["grpc_service", "grpc_method", "grpc_type", "grpc_code"],
             registers: [prometheusClient.register],
         });
+    }
+
+    dispose(): void {
+        prometheusClient.register.removeSingleMetric("grpc_client_started_total");
+        prometheusClient.register.removeSingleMetric("grpc_client_msg_sent_total");
+        prometheusClient.register.removeSingleMetric("grpc_client_msg_received_total");
+        prometheusClient.register.removeSingleMetric("grpc_client_handled_total");
+        prometheusClient.register.removeSingleMetric("grpc_client_handling_seconds");
     }
 
     started(labels: IGrpcCallMetricsLabels): void {

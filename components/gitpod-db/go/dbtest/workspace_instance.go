@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package dbtest
 
@@ -67,7 +67,7 @@ func NewWorkspaceInstance(t *testing.T, instance db.WorkspaceInstance) db.Worksp
 		status = instance.Status
 	}
 
-	attributionID := db.NewUserAttributionID(uuid.New().String())
+	attributionID := db.NewTeamAttributionID(uuid.New().String())
 	if instance.UsageAttributionID != "" {
 		attributionID = instance.UsageAttributionID
 	}

@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package storage
 
@@ -157,7 +157,7 @@ func gcpEnsureExists(ctx context.Context, client *gcpstorage.Client, bucketName 
 	err = hdl.Create(ctx, gcpConfig.Project, &gcpstorage.BucketAttrs{
 		Location: gcpConfig.Region,
 	})
-	if e, ok := err.(*googleapi.Error); ok && e.Code == http.StatusConflict && strings.Contains(strings.ToLower(e.Message), "you already own this bucket") {
+	if e, ok := err.(*googleapi.Error); ok && e.Code == http.StatusConflict && strings.Contains(strings.ToLower(e.Message), "you already own") {
 		// Looks like we had a bucket creation race and lost.
 		// That's ok - at least the bucket exists now and is still owned by us.
 	} else if err != nil {
@@ -528,7 +528,7 @@ func (p *PresignedGCPStorage) Bucket(owner string) string {
 }
 
 // BlobObject returns a blob's object name
-func (p *PresignedGCPStorage) BlobObject(name string) (string, error) {
+func (p *PresignedGCPStorage) BlobObject(userID, name string) (string, error) {
 	return blobObjectName(name)
 }
 
@@ -728,7 +728,7 @@ func (p *PresignedGCPStorage) DeleteObject(ctx context.Context, bucket string, q
 }
 
 // DeleteBucket deletes a bucket
-func (p *PresignedGCPStorage) DeleteBucket(ctx context.Context, bucket string) (err error) {
+func (p *PresignedGCPStorage) DeleteBucket(ctx context.Context, userID, bucket string) (err error) {
 	client, err := newGCPClient(ctx, p.config)
 	if err != nil {
 		return err

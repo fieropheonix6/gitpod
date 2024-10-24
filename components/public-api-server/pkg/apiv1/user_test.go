@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package apiv1
 
@@ -11,10 +11,13 @@ import (
 	"testing"
 
 	"github.com/bufbuild/connect-go"
+	"github.com/gitpod-io/gitpod/components/public-api/go/config"
 	v1 "github.com/gitpod-io/gitpod/components/public-api/go/experimental/v1"
 	"github.com/gitpod-io/gitpod/components/public-api/go/experimental/v1/v1connect"
 	protocol "github.com/gitpod-io/gitpod/gitpod-protocol"
 	"github.com/gitpod-io/gitpod/public-api-server/pkg/auth"
+	"github.com/gitpod-io/gitpod/public-api-server/pkg/jws"
+	"github.com/gitpod-io/gitpod/public-api-server/pkg/jws/jwstest"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -62,6 +65,24 @@ func TestUserService_ListSSHKeys(t *testing.T) {
 	})
 }
 
+func TestUserService_GetGitToken(t *testing.T) {
+	t.Run("proxies request to server", func(t *testing.T) {
+		serverMock, client := setupUserService(t)
+
+		token := newGitToken(&protocol.Token{
+			Username: "John",
+		})
+
+		serverMock.EXPECT().GetToken(gomock.Any(), &protocol.GetTokenSearchOptions{Host: "github.com"}).Return(token, nil)
+
+		retrieved, err := client.GetGitToken(context.Background(), connect.NewRequest(&v1.GetGitTokenRequest{Host: "github.com"}))
+		require.NoError(t, err)
+		requireEqualProto(t, &v1.GetGitTokenResponse{
+			Token: gitTokenToAPIResponse(token),
+		}, retrieved.Msg)
+	})
+}
+
 func setupUserService(t *testing.T) (*protocol.MockAPIInterface, v1connect.UserServiceClient) {
 	t.Helper()
 
@@ -74,7 +95,16 @@ func setupUserService(t *testing.T) (*protocol.MockAPIInterface, v1connect.UserS
 		api: serverMock,
 	})
 
-	_, handler := v1connect.NewUserServiceHandler(svc, connect.WithInterceptors(auth.NewServerInterceptor()))
+	keyset := jwstest.GenerateKeySet(t)
+	rsa256, err := jws.NewRSA256(keyset)
+	require.NoError(t, err)
+
+	_, handler := v1connect.NewUserServiceHandler(svc, connect.WithInterceptors(auth.NewServerInterceptor(config.SessionConfig{
+		Issuer: "unitetest.com",
+		Cookie: config.CookieConfig{
+			Name: "cookie_jwt",
+		},
+	}, rsa256)))
 
 	srv := httptest.NewServer(handler)
 	t.Cleanup(srv.Close)
@@ -133,6 +163,32 @@ func newSSHKey(t *protocol.UserSSHPublicKeyValue) *protocol.UserSSHPublicKeyValu
 
 	if t.CreationTime != "" {
 		result.CreationTime = t.CreationTime
+	}
+
+	return result
+}
+
+func newGitToken(t *protocol.Token) *protocol.Token {
+	result := &protocol.Token{
+		ExpiryDate:   "2022-10-10T10:10:10.000Z",
+		IDToken:      uuid.New().String(),
+		RefreshToken: "",
+		Scopes:       []string{"public_repo", "repo", "user:email"},
+		UpdateDate:   "2022-10-10T10:10:10.000Z",
+		Username:     "john",
+		Value:        "gh_abcdefg123456789",
+	}
+
+	if t.IDToken != "" {
+		result.IDToken = t.IDToken
+	}
+
+	if t.Username != "" {
+		result.Username = t.Username
+	}
+
+	if len(t.Scopes) != 0 {
+		result.Scopes = t.Scopes
 	}
 
 	return result

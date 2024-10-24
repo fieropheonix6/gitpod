@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package ports
 
@@ -80,6 +80,7 @@ func (configs *Configs) Get(port uint32) (*SortConfig, ConfigKind, bool) {
 					OnOpen:      rangeConfig.OnOpen,
 					Visibility:  rangeConfig.Visibility,
 					Description: rangeConfig.Description,
+					Protocol:    rangeConfig.Protocol,
 					Name:        rangeConfig.Name,
 				},
 				Sort: rangeConfig.Sort,
@@ -99,15 +100,13 @@ type ConfigInterace interface {
 type ConfigService struct {
 	workspaceID   string
 	configService config.ConfigInterface
-	gitpodAPI     gitpod.APIInterface
 }
 
 // NewConfigService creates a new instance of ConfigService.
-func NewConfigService(workspaceID string, configService config.ConfigInterface, gitpodAPI gitpod.APIInterface) *ConfigService {
+func NewConfigService(workspaceID string, configService config.ConfigInterface) *ConfigService {
 	return &ConfigService{
 		workspaceID:   workspaceID,
 		configService: configService,
-		gitpodAPI:     gitpodAPI,
 	}
 }
 
@@ -181,6 +180,7 @@ func parseInstanceConfigs(ports []*gitpod.PortsItems) (portConfigs map[uint32]*S
 						Port:        float64(Port),
 						Visibility:  config.Visibility,
 						Description: config.Description,
+						Protocol:    config.Protocol,
 						Name:        config.Name,
 					},
 					Sort: uint32(index),

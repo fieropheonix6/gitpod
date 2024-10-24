@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package dbtest
 
@@ -18,7 +18,7 @@ func NewCostCenter(t *testing.T, record db.CostCenter) db.CostCenter {
 	t.Helper()
 
 	result := db.CostCenter{
-		ID:                db.NewUserAttributionID(uuid.New().String()),
+		ID:                db.NewTeamAttributionID(uuid.New().String()),
 		CreationTime:      db.NewVarCharTime(time.Now()),
 		SpendingLimit:     100,
 		BillingStrategy:   db.CostCenter_Stripe,

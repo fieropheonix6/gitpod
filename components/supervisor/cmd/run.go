@@ -1,16 +1,13 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package cmd
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
 
 	common_grpc "github.com/gitpod-io/gitpod/common-go/grpc"
-	"github.com/gitpod-io/gitpod/common-go/log"
 	"github.com/gitpod-io/gitpod/supervisor/pkg/supervisor"
 )
 
@@ -23,7 +20,9 @@ var runCmd = &cobra.Command{
 	Short: "starts the supervisor",
 
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Init(ServiceName, Version, true, os.Getenv("SUPERVISOR_DEBUG_ENABLE") == "true")
+		logFile := initLog(!runOpts.RunGP)
+		defer logFile.Close()
+
 		common_grpc.SetupLogging()
 		supervisor.Version = Version
 		supervisor.Run(supervisor.WithRunGP(runOpts.RunGP))

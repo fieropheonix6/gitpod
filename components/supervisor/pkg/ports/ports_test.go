@@ -1,6 +1,6 @@
 // Copyright (c) 2020 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package ports
 
@@ -788,7 +788,7 @@ func (tep *testExposedPorts) Observe(ctx context.Context) (<-chan []ExposedPort,
 func (tep *testExposedPorts) Run(ctx context.Context) {
 }
 
-func (tep *testExposedPorts) Expose(ctx context.Context, local uint32, public bool) <-chan error {
+func (tep *testExposedPorts) Expose(ctx context.Context, local uint32, public bool, protocol string) <-chan error {
 	tep.mu.Lock()
 	defer tep.mu.Unlock()
 

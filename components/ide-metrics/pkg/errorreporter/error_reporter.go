@@ -1,6 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package errorreporter
 
@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/gitpod-io/gitpod/common-go/log"
+	"github.com/gitpod-io/gitpod/components/scrubber"
 )
 
 type ErrorReporter interface {
@@ -45,6 +46,11 @@ type logErrorReporter struct {
 }
 
 func (r *logErrorReporter) Report(event ReportedErrorEvent) {
+	err := scrubber.Default.Struct(&event)
+	if err != nil {
+		log.WithError(err).Error("cannot scrub error")
+		return
+	}
 	b, err := json.Marshal(event)
 	if err != nil {
 		log.WithError(err).Error("cannot marshal error")

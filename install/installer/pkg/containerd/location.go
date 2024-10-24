@@ -1,5 +1,6 @@
 // Copyright (c) 2022 Gitpod GmbH. All rights reserved.
-// Licensed under the MIT License. See License-MIT.txt in the project root for license information.
+/// Licensed under the GNU Affero General Public License (AGPL).
+// See License.AGPL.txt in the project root for license information.
 
 package containerd
 
@@ -17,7 +18,7 @@ var (
 
 // This is the default location - this will be used for most installations
 const (
-	ContainerdSocketLocationDefault ContainerdSocketLocation = "/run/containerd/containerd.sock"
+	ContainerdSocketLocationDefault ContainerdSocketLocation = "/run/containerd"
 	ContainerdLocationDefault       ContainerdLocation       = "/var/lib/containerd/io.containerd.runtime.v2.task/k8s.io"
 )
 

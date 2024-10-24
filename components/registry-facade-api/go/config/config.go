@@ -1,6 +1,6 @@
 // Copyright (c) 2021 Gitpod GmbH. All rights reserved.
 // Licensed under the GNU Affero General Public License (AGPL).
-// See License-AGPL.txt in the project root for license information.
+// See License.AGPL.txt in the project root for license information.
 
 package config
 
@@ -64,7 +64,7 @@ type Config struct {
 	Port               int              `json:"port"`
 	Prefix             string           `json:"prefix"`
 	StaticLayer        []StaticLayerCfg `json:"staticLayer"`
-	RemoteSpecProvider *RSProvider      `json:"remoteSpecProvider,omitempty"`
+	RemoteSpecProvider []*RSProvider    `json:"remoteSpecProvider,omitempty"`
 	FixedSpecProvider  string           `json:"fixedSpecFN,omitempty"`
 	Store              string           `json:"store"`
 	RequireAuth        bool             `json:"requireAuth"`

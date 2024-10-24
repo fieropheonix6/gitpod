@@ -1,40 +1,35 @@
 /**
  * Copyright (c) 2022 Gitpod GmbH. All rights reserved.
  * Licensed under the GNU Affero General Public License (AGPL).
- * See License-AGPL.txt in the project root for license information.
+ * See License.AGPL.txt in the project root for license information.
  */
 
-import { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router";
+import { OrgSettingsPage } from "./OrgSettingsPage";
 import { BillingMode } from "@gitpod/gitpod-protocol/lib/billing-mode";
-import { getCurrentTeam, TeamsContext } from "./teams-context";
-import { getGitpodService } from "../service/service";
 import UsageBasedBillingConfig from "../components/UsageBasedBillingConfig";
-import { AttributionId } from "@gitpod/gitpod-protocol/lib/attribution";
+import { useOrgBillingMode } from "../data/billing-mode/org-billing-mode-query";
+import { useIsOwner } from "../data/organizations/members-query";
+import { Redirect } from "react-router";
 
-export default function TeamUsageBasedBilling() {
-    const { teams } = useContext(TeamsContext);
-    const location = useLocation();
-    const team = getCurrentTeam(location, teams);
-    const [teamBillingMode, setTeamBillingMode] = useState<BillingMode | undefined>(undefined);
+export default function TeamUsageBasedBillingPage() {
+    return (
+        <OrgSettingsPage>
+            <TeamUsageBasedBilling />
+        </OrgSettingsPage>
+    );
+}
 
-    useEffect(() => {
-        if (!team) return;
+function TeamUsageBasedBilling() {
+    const orgBillingMode = useOrgBillingMode();
+    const isOwner = useIsOwner();
 
-        (async () => {
-            const teamBillingMode = await getGitpodService().server.getBillingModeForTeam(team.id);
-            setTeamBillingMode(teamBillingMode);
-        })();
-    }, [team]);
+    if (!isOwner) {
+        return <Redirect to="/settings" />;
+    }
 
-    if (!BillingMode.showUsageBasedBilling(teamBillingMode)) {
+    if (!BillingMode.showUsageBasedBilling(orgBillingMode.data)) {
         return <></>;
     }
 
-    return (
-        <>
-            <h3>Team Billing</h3>
-            <UsageBasedBillingConfig attributionId={team && AttributionId.render({ kind: "team", teamId: team.id })} />
-        </>
-    );
+    return <UsageBasedBillingConfig hideSubheading />;
 }
